@@ -2,7 +2,7 @@ Project Milestone 1: Go
 --------------------------------
 
 ### Rules
-- You are to create a simple implementation of Go game in OCaml. This is the first part of a project. The game have two players - white pieces and black pieces. The starting state should be an empty board of 16 * 16 that looks like the following
+- create a simple implementation of Go game in OCaml. This is the first part of a project. The game have two players - white pieces and black pieces. The starting state should be an empty board of 16 * 16 that looks like the following
 
      1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 
  1 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
@@ -22,7 +22,7 @@ Project Milestone 1: Go
 15 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
 16 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
 
-- In each iteration, you should prompt the user to input a set of two numbers x y that represents the column and row of the location where they intend to place their move. 
+- In each iteration, prompt the user to input a set of two numbers x y that represents the column and row of the location where they intend to place their move. 
 A legal move can only be made in a position that is currently empty and not outside the bounds of the board
 
 - For example, an input of 2 2 will result in 
@@ -229,8 +229,4 @@ White's score would be
 35 points
 
 ### Code Style
-- You are free to implement this project however you want, but there should be at least three modules - players, board and game_controller. 
 - Do not use mutations
-
-### Submission and Grading
-- As usual, run a final dune clean; dune build and then upload _build/default/ocaml-go.zip to Gradescope.
