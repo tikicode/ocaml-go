@@ -17,7 +17,7 @@ let init size player =
     white_slots = size * size;
   }
 
-(* run DFS on the player, to check whether it is alive or not *)
+(* run DFS on the player, to check whether piece is alive *)
 let rec dfs board player visited stack =
   match stack with
   (* dfs over, the player is dead *)
