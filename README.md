@@ -5,8 +5,8 @@ Project Milestone 1: Go
 - create a simple implementation of Go game in OCaml. This is the first part of a project. The game have two players - white pieces and black pieces. The starting state should be an empty board of 16 * 16 that looks like the following
 
      1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 
- 1 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
- 2 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
+ 1 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ] \n
+ 2 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ] \n
  3 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  4 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  5 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
