@@ -1,178 +1,148 @@
 open Core
+open Players
+open Board
 
-(* board, first player and empty slots for black and white player *)
-type t = {
-  board : Board.t;
-  player : Players.t;
-  black_slots : int;
-  white_slots : int;
-}
-
-(* create a game *)
-let init size player =
-  {
-    board = Board.init size;
-    player;
-    black_slots = size * size;
-    white_slots = size * size;
+module Game_controller = struct
+  type t = {
+    bd : Board.t;
+    player : Go_players.t;
+    black_slots : int;
+    white_slots : int;
   }
 
-(* run DFS on the player, to check whether piece is alive *)
-let rec dfs board player visited stack =
-  match stack with
-  (* dfs over, the player is dead *)
-  | [] -> false
-  (* skip visited coord *)
-  | coord :: st when Set.mem visited coord -> dfs board player visited st
-  (* process unvisited coord *)
-  | coord :: st ->
-      (* get the p at coord *)
-      let p = Board.get_player board coord in
-      (* find a blank pos *)
-      if Players.is_blank p then true
-        (* p is not the same side with player, skip it *)
-      else if not (Players.is_same player p) then dfs board player visited st
-        (* p is same side with player, check all p's neighbours *)
-      else
-        let neighbours = Board.get_neighbours board coord in
-        (* only process unvisited *)
-        let unvisited =
-          List.filter neighbours ~f:(fun c -> not (Set.mem visited c))
-        in
-        (* add coord to visited, add unvistied to stack *)
-        dfs board player (Set.add visited coord) (unvisited @ st)
+  let init_game (size : int) (player : Go_players.t) : t =
+    {
+      bd = Board.init_board size;
+      player;
+      black_slots = size * size;
+      white_slots = size * size;
+    }
 
-(* check whether a coord is alive *)
-let is_alive board player coord =
-  (* get the player at coord *)
-  let p = Board.get_player board coord in
-  (* blank player, alive *)
-  if Players.is_blank p then true (* skip same side *)
-  else if Players.is_same player p then true
-  else
-    (* run dfs from coord *)
-    let set = Set.empty (module Tuple.Comparator (Int) (Int)) in
-    dfs board p set [ coord ]
+  let game_done (bd : Board.t) : unit =
+    let black_score =
+      Board.count bd ~f:(Go_players.is_consistent Go_players.black)
+    in
+    let white_score =
+      Board.count bd ~f:(Go_players.is_consistent Go_players.white)
+    in
+    Printf.printf "\nThe score of player Black is: %d\n" black_score;
+    Printf.printf "The score of player White is: %d\n" white_score
 
-(* take all dead pieces *)
-let take_pieces player board =
-  (* get all coordinates *)
-  let coords = Board.all_coordinates board in
-  let holden = Players.hold player in
-  (* get all dead coordiniates *)
-  let deads =
-    List.filter coords ~f:(fun coord -> not (is_alive board player coord))
-  in
-  (* replace dead coordinites with proper pieces *)
-  let new_board =
-    List.fold deads ~init:board ~f:(fun bd coord ->
-        Board.update_board bd coord holden)
-  in
-  (new_board, List.length deads)
+  let check_done (player : Go_players.t) (black_slots : int) (white_slots : int)
+      : bool =
+    if Go_players.is_white player then white_slots <= 0 else black_slots <= 0
 
-(* game is done, print score *)
-let game_done board =
-  let black_score =
-    Board.count board ~f:(Players.is_consistent Players.black)
-  in
-  let white_score =
-    Board.count board ~f:(Players.is_consistent Players.white)
-  in
-  Printf.printf "\nThe score of player Black is: %d\n" black_score;
-  Printf.printf "The score of player White is: %d\n" white_score
+  let update_game (bd : Board.t) (player : Go_players.t) (black_slots : int)
+      (white_slots : int) (pieces : int) : t =
+    let new_player = Go_players.opposite player in
+    if pieces = 0 then
+      {
+        bd;
+        player = new_player;
+        black_slots = black_slots - 1;
+        white_slots = white_slots - 1;
+      }
+    else if Go_players.is_white player then
+      {
+        bd;
+        player = new_player;
+        black_slots = black_slots + pieces - 2;
+        white_slots = white_slots + pieces - 1;
+      }
+    else
+      {
+        bd;
+        player = new_player;
+        black_slots = black_slots + pieces - 1;
+        white_slots = white_slots + pieces - 2;
+      }
 
-(* check whether the coordniate can be used to place piece *)
-let check_coords board coord =
-  (* invalid coord *)
-  if not (Board.valid_coordinate board coord) then (
-    print_string "Invalid coordinitate.\n";
-    false)
-  else
-    let p = Board.get_player board coord in
-    if Players.is_blank p then true
-    else (
-      (* occupied *)
-      print_string "The position has already been occupied.\n";
+  let check_coords (board : Board.t) (coord : int * int) : bool =
+    if not (Board.valid_coordinate board coord) then (
+      print_string "Invalid coordinitate.\n";
       false)
+    else
+      let p = Board.get_player board coord in
+      if Go_players.is_blank p then true
+      else (
+        print_string "The position has already been occupied.\n";
+        false)
 
-let check_done player black_slots white_slots =
-  if Players.is_white player then white_slots <= 0 else black_slots <= 0
+  let rec dfs (board : Board.t) (player : Go_players.t)
+      (visited : (int * int, 'a) Set.t) (stack : (int * int) list) : bool =
+    match stack with
+    | [] -> false
+    | coord :: st when Set.mem visited coord -> dfs board player visited st
+    | coord :: st ->
+        let p = Board.get_player board coord in
+        if Go_players.is_blank p then true
+        else if not (Go_players.is_same player p) then
+          dfs board player visited st
+        else
+          let neighbours = Board.get_neighbours board coord in
+          let unvisited =
+            List.filter neighbours ~f:(fun c -> not (Set.mem visited c))
+          in
+          dfs board player (Set.add visited coord) (unvisited @ st)
 
-let check_move board player coord =
-  is_alive board (Players.opposite player) coord
+  let is_alive (bd : Board.t) (player : Go_players.t) (coord : int * int) : bool
+      =
+    let p = Board.get_player bd coord in
+    if Go_players.is_blank p then true
+    else if Go_players.is_same player p then true
+    else
+      let set = Set.empty (module Tuple.Comparator (Int) (Int)) in
+      dfs bd p set [ coord ]
 
-let update_game board player black_slots white_slots pieces =
-  let new_player = Players.opposite player in
-  if pieces = 0 then
-    {
-      board;
-      player = new_player;
-      black_slots = black_slots - 1;
-      white_slots = white_slots - 1;
-    }
-  else if Players.is_white player then
-    {
-      board;
-      player = new_player;
-      black_slots = black_slots + pieces - 2;
-      white_slots = white_slots + pieces - 1;
-    }
-  else
-    {
-      board;
-      player = new_player;
-      black_slots = black_slots + pieces - 1;
-      white_slots = white_slots + pieces - 2;
-    }
+  let check_move (bd : Board.t) (player : Go_players.t) (coord : int * int) :
+      bool =
+    is_alive bd (Go_players.opposite player) coord
 
-(* run the game *)
-let rec run { board; player; black_slots; white_slots } =
-  (* no free slot, done *)
-  if check_done player black_slots white_slots then game_done board
-  else (
-    (* print board *)
-    Board.print board;
-    (* get input from player *)
-    Printf.printf
-      "Player %s, enter the row and column (e.g. '2 2')\n\
-       to place your piece (ctrl-d to quit): " (Players.to_string player);
-    Out_channel.(flush stdout);
-    (* check input *)
-    match In_channel.(input_line stdin) with
-    (* no input, done *)
-    | None -> game_done board
-    (* has input *)
-    | Some input -> (
-        (* parse input *)
-        match String.split_on_chars input ~on:[ ' ' ] with
-        | [ s1; s2 ] -> (
-            (* parse coordinate *)
-            match (int_of_string_opt s1, int_of_string_opt s2) with
-            | Some row, Some col ->
-                (* get coord *)
-                let coord = (row - 1, col - 1) in
-                (* check coord *)
-                if check_coords board coord then
-                  (* place piece *)
-                  let new_board = Board.update_board board coord player in
-                  (* take dead pieces *)
-                  let occupied_board, pieces = take_pieces player new_board in
-                  (* check whether move is valid *)
-                  if check_move occupied_board player coord then
-                    (* run new game*)
-                    run
-                      (update_game occupied_board player black_slots white_slots
-                         pieces)
-                  else (
-                    print_string "The position will make your piece(s) dead\n";
-                    run { board; player; black_slots; white_slots })
-                  (* invalid integer, try again *)
-                else run { board; player; black_slots; white_slots }
-            | _ ->
-                print_string "Invalid input.\n";
-                run { board; player; black_slots; white_slots })
-        (* invalid format, try again *)
-        | _ ->
-            print_string
-              "Invalid input format. Please enter coordinates as 'row col'.\n";
-            run { board; player; black_slots; white_slots }))
+  let take_pieces (player : Go_players.t) (bd : Board.t) : Board.t * int =
+    let coords = Board.get_board bd in
+    let holden = Go_players.hold player in
+    let deads =
+      List.filter coords ~f:(fun coord -> not (is_alive bd player coord))
+    in
+    let new_board =
+      List.fold deads ~init:bd ~f:(fun bd coord ->
+          Board.update_board bd coord holden)
+    in
+    (new_board, List.length deads)
+
+  let rec run { bd; player; black_slots; white_slots } =
+    if check_done player black_slots white_slots then game_done bd
+    else (
+      Board.print_board bd;
+      Printf.printf
+        "Player %s, enter the row and column (e.g. '2 2')\n\
+         to place your piece (ctrl-d to quit): "
+        (Go_players.to_string player);
+      Out_channel.(flush stdout);
+      match In_channel.(input_line stdin) with
+      | None -> game_done bd
+      | Some input -> (
+          match String.split_on_chars input ~on:[ ' ' ] with
+          | [ s1; s2 ] -> (
+              match (int_of_string_opt s1, int_of_string_opt s2) with
+              | Some row, Some col ->
+                  let coord = (row - 1, col - 1) in
+                  if check_coords bd coord then
+                    let new_board = Board.update_board bd coord player in
+                    let occupied_board, pieces = take_pieces player new_board in
+                    if check_move occupied_board player coord then
+                      run
+                        (update_game occupied_board player black_slots
+                           white_slots pieces)
+                    else (
+                      print_string "The position will make your piece(s) dead\n";
+                      run { bd; player; black_slots; white_slots })
+                  else run { bd; player; black_slots; white_slots }
+              | _ ->
+                  print_string "Invalid input.\n";
+                  run { bd; player; black_slots; white_slots })
+          | _ ->
+              print_string
+                "Invalid input format. Please enter coordinates as 'row col'.\n";
+              run { bd; player; black_slots; white_slots }))
+end

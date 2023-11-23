@@ -1,89 +1,68 @@
 open Core
+open Players
 
-(* board tow-dim list and size *)
-type t = { board : Players.t list list; size : int }
+module Board = struct
+  type t = { board : Go_players.t list list; size : int }
 
-let init size =
-  let board =
-    (* create an all empty board *)
-    List.init size ~f:(fun _ -> List.init size ~f:(fun _ -> Players.empty))
-  in
-  { board; size }
+  let init_board (size : int) : t =
+    let board =
+      List.init size ~f:(fun _ -> List.init size ~f:(fun _ -> Go_players.empty))
+    in
+    { board; size }
 
-let valid_coordinate bd (row, col) =
-  (* check index range *)
-  row >= 0 && col >= 0 && row < bd.size && col < bd.size
+  let print_board (bd : t) : unit =
+    let rec print_rows (board : Go_players.t list list) (n : int) : unit =
+      match board with
+      | [] -> ()
+      | row :: rs ->
+          Printf.printf "%2d " n;
+          List.iter row ~f:(fun p ->
+              Printf.printf "[%c]" (Go_players.to_char p));
+          Out_channel.newline stdout;
+          print_rows rs (n + 1)
+    in
+    print_string "   ";
+    for i = 1 to bd.size do
+      Printf.printf "%2d " i
+    done;
+    Out_channel.newline stdout;
+    print_rows bd.board 1
 
-let get_neighbours board (x, y) =
-  (* generate all neighbours *)
-  let coords = [ (x - 1, y); (x + 1, y); (x, y - 1); (x, y + 1) ] in
-  (* filter, keep only valid coordinates *)
-  List.filter coords ~f:(fun coord -> valid_coordinate board coord)
+  let valid_coordinate (bd : t) ((row, col) : int * int) : bool =
+    row >= 0 && col >= 0 && row < bd.size && col < bd.size
 
-let print { board; size } =
-  (* helper function to print rows *)
-  let rec print_rows bd n =
-    match bd with
-    | [] -> ()
-    | row :: rs ->
-        (* print row number *)
-        Printf.printf "%2d " n;
-        (* print row elements *)
-        List.iter row ~f:(fun p -> Printf.printf "[%c]" (Players.to_char p));
-        Out_channel.newline stdout;
-        (* print left rows *)
-        print_rows rs (n + 1)
-  in
-  (* print column numbers *)
-  print_string "   ";
-  for i = 1 to size do
-    Printf.printf "%2d " i
-  done;
-  Out_channel.newline stdout;
-  (* print rows *)
-  print_rows board 1
+  let get_neighbours (bd : t) ((x, y) : int * int) : (int * int) list =
+    let coords = [ (x - 1, y); (x + 1, y); (x, y - 1); (x, y + 1) ] in
+    List.filter coords ~f:(fun coord -> valid_coordinate bd coord)
 
-(* the caller must ensure coordiniate is valid *)
-let get_player bd (x, y) = List.nth_exn (List.nth_exn bd.board x) y
+  let get_player (bd : t) ((x, y) : int * int) : Go_players.t =
+    List.nth_exn (List.nth_exn bd.board x) y
 
-let update_board { board; size } (x, y) p =
-  (* rows before the target row *)
-  let part1 = List.take board x in
-  (* rows start with the target row *)
-  let part = List.drop board x in
-  (* the target row *)
-  let row = List.hd_exn part in
-  (* rows after the target row *)
-  let part2 = List.tl_exn part in
-  (* columns before the target column *)
-  let col_part1 = List.take row y in
-  (* columns start with the target column *)
-  let col_part = List.drop row y in
-  (* columns after the target column *)
-  let col_part2 = List.tl_exn col_part in
-  (* create new row *)
-  let new_row = col_part1 @ (p :: col_part2) in
-  (* create new board *)
-  { board = part1 @ (new_row :: part2); size }
+  let update_board ({ board; size } : t) ((x, y) : int * int) (p : Go_players.t)
+      : t =
+    let rows_before = List.take board x in
+    let rows_cur_after = List.drop board x in
+    let target_row = List.hd_exn rows_cur_after in
+    let rows_after = List.tl_exn rows_cur_after in
+    let cols_before = List.take target_row y in
+    let cols_cur_after = List.drop target_row y in
+    let cols_after = List.tl_exn cols_cur_after in
+    let new_row = cols_before @ (p :: cols_after) in
+    { board = rows_before @ (new_row :: rows_after); size }
 
-let all_coordinates bd =
-  (* helper function to get all coordinates *)
-  let rec aux x y coords =
-    (* check boundary *)
-    match (x = bd.size, y = bd.size) with
-    (* done *)
-    | true, _ -> coords
-    (* update x coord *)
-    | false, true -> aux (x + 1) 0 coords
-    (* update y coord *)
-    | _ -> aux x (y + 1) ((x, y) :: coords)
-  in
-  aux 0 0 []
+  let get_board (bd : t) : (int * int) list =
+    let rec aux (x : int) (y : int) (coords : (int * int) list) :
+        (int * int) list =
+      match (x = bd.size, y = bd.size) with
+      | true, _ -> coords
+      | false, true -> aux (x + 1) 0 coords
+      | _ -> aux x (y + 1) ((x, y) :: coords)
+    in
+    aux 0 0 []
 
-let count bd ~f =
-  (* helper function to count row *)
-  let count_row row =
-    List.fold row ~init:0 ~f:(fun acc p -> if f p then acc + 1 else acc)
-  in
-  (* count all rows *)
-  List.fold bd.board ~init:0 ~f:(fun acc row -> acc + count_row row)
+  let count (bd : t) ~f : int =
+    let count_row (row : Go_players.t list) =
+      List.fold row ~init:0 ~f:(fun acc p -> if f p then acc + 1 else acc)
+    in
+    List.fold bd.board ~init:0 ~f:(fun acc row -> acc + count_row row)
+end

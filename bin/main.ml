@@ -1,6 +1,7 @@
 open Go
+open Players
+open Game_controller
 
 let () =
-  (* create a game and run *)
-  let game = Game_controller.init 16 Players.black in
+  let game = Game_controller.init_game 16 Go_players.black in
   Game_controller.run game
