@@ -6,7 +6,7 @@ module Game_controller : sig
   type t
 
   val init_game : int -> Go_players.t -> t
-  val game_done : Board.t -> unit
+  val game_done : Board.t -> int -> int -> unit
   val check_done : Go_players.t -> int -> int -> bool
   val update_game : Board.t -> Go_players.t -> int -> int -> int -> t
   val check_coords : Board.t -> int * int -> bool
