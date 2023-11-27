@@ -23,10 +23,17 @@ module Game_controller = struct
       Board.count bd ~f:(Go_players.is_consistent Go_players.black)
     in
     let white_score =
-      Board.count bd ~f:(Go_players.is_consistent Go_players.white)
+      (Board.count bd ~f:(Go_players.is_consistent Go_players.white) + 6)
     in
-    Printf.printf "\nThe score of player Black is: %d\n" black_score;
-    Printf.printf "The score of player White is: %d\n" white_score
+    Printf.printf "\nThe score of player Black is: %d\n" black_score ;
+    Printf.printf "The score of player White is: %d\n" white_score ;
+    
+    if black_score > white_score then
+      Printf.printf "Player Black wins!\n"
+    else if black_score < white_score then
+      Printf.printf "Player White wins!\n"
+    else
+      Printf.printf "It's a tie!\n"
 
   let check_done (player : Go_players.t) (black_slots : int) (white_slots : int)
       : bool =
