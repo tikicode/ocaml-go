@@ -1,3 +1,11 @@
 (executable
  (name main)
+ (modules Main)
  (libraries go))
+
+(executable
+ (name dream_routes)
+ (modules Dream_routes)
+ (libraries dream yojson ppx_deriving_yojson.runtime core)
+ (preprocess
+  (pps ppx_deriving_yojson)))

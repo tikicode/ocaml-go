@@ -18,15 +18,22 @@ module Game_controller = struct
       white_slots = size * size;
     }
 
-  let game_done (bd : Board.t) : unit =
+  let game_done (bd : Board.t) (white_handi : int) (black_handi : int): unit =
     let black_score =
-      Board.count bd ~f:(Go_players.is_consistent Go_players.black)
+      Board.count bd ~f:(Go_players.is_consistent Go_players.black) + black_handi
     in
     let white_score =
-      Board.count bd ~f:(Go_players.is_consistent Go_players.white)
+      (Board.count bd ~f:(Go_players.is_consistent Go_players.white) + 6 + white_handi)
     in
-    Printf.printf "\nThe score of player Black is: %d\n" black_score;
-    Printf.printf "The score of player White is: %d\n" white_score
+    Printf.printf "\nThe score of player Black is: %d\n" black_score ;
+    Printf.printf "The score of player White is: %d\n" white_score ;
+    
+    if black_score > white_score then
+      Printf.printf "Player Black wins!\n"
+    else if black_score < white_score then
+      Printf.printf "Player White wins!\n"
+    else
+      Printf.printf "It's a tie!\n"
 
   let check_done (player : Go_players.t) (black_slots : int) (white_slots : int)
       : bool =
@@ -111,7 +118,7 @@ module Game_controller = struct
     (new_board, List.length deads)
 
   let rec run { bd; player; black_slots; white_slots } =
-    if check_done player black_slots white_slots then game_done bd
+    if check_done player black_slots white_slots then game_done bd 0 0
     else (
       Board.print_board bd;
       Printf.printf
@@ -120,7 +127,7 @@ module Game_controller = struct
         (Go_players.to_string player);
       Out_channel.(flush stdout);
       match In_channel.(input_line stdin) with
-      | None -> game_done bd
+      | None -> game_done bd 0 0
       | Some input -> (
           match String.split_on_chars input ~on:[ ' ' ] with
           | [ s1; s2 ] -> (

@@ -1,11 +1,9 @@
-# dune fmt
+# dune exec -- ./dream_routes.exe
 # OCAMLPARAM: unset
 # Shared cache: disabled
-# Workspace root:
-# "/Users/avnukala/Library/CloudStorage/OneDrive-JohnsHopkins/Documents/JHU/JHU
-# 2023 Fall/fp/ocaml-go"
-# Auto-detected concurrency: 16
-$ /Users/avnukala/.opam/5.0.0/bin/ocamlc.opt -config > /var/folders/cb/p6mtjc5s67j7113ydz6m0tph0000gq/T/dune_6a6983_output
+# Workspace root: /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go
+# Auto-detected concurrency: 8
+$ /Users/johndaviddelucia/.opam/5.0.0/bin/ocamlc.opt -config > /var/folders/b_/6vj9qcl12t5477qfv33hnb140000gn/T/dune_11f13a_output
 # Dune context:
 #  { name = "default"
 #  ; kind = "default"
@@ -14,27 +12,31 @@ $ /Users/avnukala/.opam/5.0.0/bin/ocamlc.opt -config > /var/folders/cb/p6mtjc5s6
 #  ; for_host = None
 #  ; fdo_target_exe = None
 #  ; build_dir = In_build_dir "default"
-#  ; ocaml_bin = External "/Users/avnukala/.opam/5.0.0/bin"
-#  ; ocaml = Ok External "/Users/avnukala/.opam/5.0.0/bin/ocaml"
-#  ; ocamlc = External "/Users/avnukala/.opam/5.0.0/bin/ocamlc.opt"
-#  ; ocamlopt = Ok External "/Users/avnukala/.opam/5.0.0/bin/ocamlopt.opt"
-#  ; ocamldep = Ok External "/Users/avnukala/.opam/5.0.0/bin/ocamldep.opt"
-#  ; ocamlmklib = Ok External "/Users/avnukala/.opam/5.0.0/bin/ocamlmklib.opt"
+#  ; ocaml_bin = External "/Users/johndaviddelucia/.opam/5.0.0/bin"
+#  ; ocaml = Ok External "/Users/johndaviddelucia/.opam/5.0.0/bin/ocaml"
+#  ; ocamlc = External "/Users/johndaviddelucia/.opam/5.0.0/bin/ocamlc.opt"
+#  ; ocamlopt =
+#      Ok External "/Users/johndaviddelucia/.opam/5.0.0/bin/ocamlopt.opt"
+#  ; ocamldep =
+#      Ok External "/Users/johndaviddelucia/.opam/5.0.0/bin/ocamldep.opt"
+#  ; ocamlmklib =
+#      Ok External "/Users/johndaviddelucia/.opam/5.0.0/bin/ocamlmklib.opt"
 #  ; installed_env =
 #      map
 #        { "INSIDE_DUNE" :
-#            "/Users/avnukala/Library/CloudStorage/OneDrive-JohnsHopkins/Documents/JHU/JHU 2023 Fall/fp/ocaml-go/_build/default"
+#            "/Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/_build/default"
 #        ; "OCAML_COLOR" : "always"
 #        ; "OPAMCOLOR" : "always"
 #        }
 #  ; findlib_paths =
-#      [ External "/Users/avnukala/.opam/5.0.0/lib/ocaml"
-#      ; External "/Users/avnukala/.opam/5.0.0/lib"
+#      [ External "/Users/johndaviddelucia/.opam/5.0.0/lib/ocaml"
+#      ; External "/Users/johndaviddelucia/.opam/5.0.0/lib"
 #      ]
 #  ; ocaml_config =
 #      { version = "5.0.0"
-#      ; standard_library_default = "/Users/avnukala/.opam/5.0.0/lib/ocaml"
-#      ; standard_library = "/Users/avnukala/.opam/5.0.0/lib/ocaml"
+#      ; standard_library_default =
+#          "/Users/johndaviddelucia/.opam/5.0.0/lib/ocaml"
+#      ; standard_library = "/Users/johndaviddelucia/.opam/5.0.0/lib/ocaml"
 #      ; standard_runtime = "the_standard_runtime_variable_was_deleted"
 #      ; ccomp_type = "cc"
 #      ; c_compiler = "cc"
@@ -80,8 +82,8 @@ $ /Users/avnukala/.opam/5.0.0/bin/ocamlc.opt -config > /var/folders/cb/p6mtjc5s6
 #      ; os_type = "Unix"
 #      ; default_executable_name = "a.out"
 #      ; systhread_supported = true
-#      ; host = "x86_64-apple-darwin22.5.0"
-#      ; target = "x86_64-apple-darwin22.5.0"
+#      ; host = "x86_64-apple-darwin20.6.0"
+#      ; target = "x86_64-apple-darwin20.6.0"
 #      ; profiling = false
 #      ; flambda = false
 #      ; spacetime = false
@@ -102,8 +104,3 @@ $ /Users/avnukala/.opam/5.0.0/bin/ocamlc.opt -config > /var/folders/cb/p6mtjc5s6
 #      }
 #  ; instrument_with = []
 #  }
-$ (cd _build/default && /Users/avnukala/.opam/5.0.0/bin/ocamlformat --intf lib/board.mli) > _build/default/lib/.formatted/board.mli
-$ (cd _build/default && /Users/avnukala/.opam/5.0.0/bin/ocamlformat --intf lib/game_controller.mli) > _build/default/lib/.formatted/game_controller.mli
-$ (cd _build/default && /Users/avnukala/.opam/5.0.0/bin/ocamlformat --impl lib/players.ml) > _build/default/lib/.formatted/players.ml
-$ (cd _build/default && /Users/avnukala/.opam/5.0.0/bin/ocamlformat --intf lib/players.mli) > _build/default/lib/.formatted/players.mli
-$ (cd _build/default && /Users/avnukala/.opam/5.0.0/bin/ocamlformat --impl lib/game_controller.ml) > _build/default/lib/.formatted/game_controller.ml
