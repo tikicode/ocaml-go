@@ -1,8 +1,0 @@
-(library
- (name go)
- (modules players board game_controller)
- (libraries core))
-
-;(env
-;  (dev
-;    (flags (:standard -warn-error -A))))

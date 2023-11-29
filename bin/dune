@@ -6,6 +6,6 @@
 (executable
  (name dream_routes)
  (modules Dream_routes)
- (libraries dream yojson ppx_deriving_yojson.runtime core)
+ (libraries dream yojson ppx_deriving_yojson.runtime core lwt)
  (preprocess
-  (pps ppx_deriving_yojson)))
+  (pps ppx_deriving_yojson lwt_ppx)))
