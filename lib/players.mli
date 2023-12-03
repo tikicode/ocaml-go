@@ -4,6 +4,8 @@ module Go_players : sig
   val empty : t
   val white : t
   val black : t
+  val blackhold : t
+  val whitehold : t
   val is_empty : t -> bool
   val is_blank : t -> bool
   val is_white : t -> bool

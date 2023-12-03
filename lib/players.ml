@@ -4,6 +4,8 @@ module Go_players = struct
   let empty = Empty
   let white = White
   let black = Black
+  let blackhold = BlackHold
+  let whitehold = WhiteHold
   let is_empty (p : t) : bool = p = Empty
 
   let is_blank (p : t) : bool =
