@@ -88,6 +88,28 @@ let test_is_consistent _ =
   assert_equal false (Go_players.is_consistent Go_players.white Go_players.black);
   assert_equal false (Go_players.is_consistent Go_players.empty Go_players.blackhold)
 
+let test_to_char _ =
+  assert_equal 'W' (Go_players.to_char Go_players.white);
+  assert_equal 'B' (Go_players.to_char Go_players.black);
+  assert_equal ' ' (Go_players.to_char Go_players.empty);
+  assert_equal ' ' (Go_players.to_char Go_players.whitehold);
+  assert_equal ' ' (Go_players.to_char Go_players.blackhold)
+
+let test_opposite _ =
+  assert_equal Go_players.black (Go_players.opposite Go_players.white);
+  assert_equal Go_players.white (Go_players.opposite Go_players.black)
+
+let test_hold _ =
+  assert_equal Go_players.whitehold (Go_players.hold Go_players.white);
+  assert_equal Go_players.blackhold (Go_players.hold Go_players.black)
+
+let test_to_string _ =
+  assert_equal "Black" (Go_players.to_string Go_players.black);
+  assert_equal "White" (Go_players.to_string Go_players.white);
+  assert_equal "" (Go_players.to_string Go_players.empty);
+  assert_equal "Black" (Go_players.to_string Go_players.blackhold);
+  assert_equal "White" (Go_players.to_string Go_players.whitehold)
+
 let suite =
   "Go Test Suite" >:::
   [
@@ -105,6 +127,10 @@ let suite =
       "test_is_white" >:: test_is_white;
       "test_is_same" >:: test_is_same;
       "test_is_consistent" >:: test_is_consistent;
+      "test_to_char" >:: test_to_char;
+      "test_opposite" >:: test_opposite;
+      "test_hold" >:: test_hold;
+      "test_to_string" >:: test_to_string;
     ];
   ]
 
