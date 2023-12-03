@@ -1,6 +1,7 @@
 open OUnit2
 open Go
 open Board
+open Players
 
 let test_get_neighbours _ =
   let board_size = 3 in
@@ -26,24 +27,85 @@ let test_valid_coordinate _ =
   let invalid_both = Board.valid_coordinate test_board (-1, 6) in
   assert_equal ~msg:"Invalid coordinate (-1, 6)" false invalid_both
 
-  let test_get_board _ =
-    let board_size = 3 in
-    let test_board = Board.init_board board_size in
-    let expected_board =
-      [(2, 2); (2, 1); (2, 0); (1, 2); (1, 1); (1, 0); (0, 2); (0, 1); (0, 0)]
-    in
-    let result_board = Board.get_board test_board in
-    assert_equal ~msg:"Incorrect board" ~printer:(fun lst ->
-        Printf.sprintf "[%s]" (String.concat "; " (List.map (fun (x, y) -> Printf.sprintf "(%d, %d)" x y) lst)))
-      expected_board
-      result_board
+let test_get_board _ =
+  let board_size = 3 in
+  let test_board = Board.init_board board_size in
+  let expected_board =
+    [(2, 2); (2, 1); (2, 0); (1, 2); (1, 1); (1, 0); (0, 2); (0, 1); (0, 0)]
+  in
+  let result_board = Board.get_board test_board in
+  assert_equal ~msg:"Incorrect board" ~printer:(fun lst ->
+      Printf.sprintf "[%s]" (String.concat "; " (List.map (fun (x, y) -> Printf.sprintf "(%d, %d)" x y) lst)))
+    expected_board
+    result_board
+
+let test_print_board _ =
+  let board_size = 3 in
+  let test_board = Board.init_board board_size in
+  let () = Board.print_board test_board in
+  assert_bool "Manually verify board is correct" true
+
+let test_is_empty _ =
+  assert_equal true (Go_players.is_empty Go_players.empty);
+  assert_equal false (Go_players.is_empty Go_players.white);
+  assert_equal false (Go_players.is_empty Go_players.black);
+  assert_equal false (Go_players.is_empty Go_players.blackhold);
+  assert_equal false (Go_players.is_empty Go_players.whitehold)
+
+let test_is_blank _ =
+  assert_equal true (Go_players.is_blank Go_players.empty);
+  assert_equal true (Go_players.is_blank Go_players.whitehold);
+  assert_equal true (Go_players.is_blank Go_players.blackhold);
+  assert_equal false (Go_players.is_blank Go_players.white);
+  assert_equal false (Go_players.is_blank Go_players.black)
+
+let test_is_white _ =
+  assert_equal true (Go_players.is_white Go_players.white);
+  assert_equal false (Go_players.is_white Go_players.black);
+  assert_equal false (Go_players.is_white Go_players.empty);
+  assert_equal false (Go_players.is_white Go_players.whitehold);
+  assert_equal false (Go_players.is_white Go_players.blackhold)
+
+let test_is_same _ =
+  assert_equal true (Go_players.is_same Go_players.white Go_players.white);
+  assert_equal true (Go_players.is_same Go_players.black Go_players.black);
+  assert_equal true (Go_players.is_same Go_players.empty Go_players.empty);
+  assert_equal true (Go_players.is_same Go_players.whitehold Go_players.whitehold);
+  assert_equal true (Go_players.is_same Go_players.blackhold Go_players.blackhold);
+  assert_equal false (Go_players.is_same Go_players.black Go_players.blackhold);
+  assert_equal false (Go_players.is_same Go_players.blackhold Go_players.black);
+  assert_equal false (Go_players.is_same Go_players.white Go_players.black);
+  assert_equal false (Go_players.is_same Go_players.empty Go_players.blackhold)
+
+let test_is_consistent _ =
+  assert_equal true (Go_players.is_consistent Go_players.white Go_players.white);
+  assert_equal true (Go_players.is_consistent Go_players.black Go_players.black);
+  assert_equal true (Go_players.is_consistent Go_players.empty Go_players.empty);
+  assert_equal true (Go_players.is_consistent Go_players.whitehold Go_players.whitehold);
+  assert_equal true (Go_players.is_consistent Go_players.blackhold Go_players.blackhold);
+  assert_equal true (Go_players.is_consistent Go_players.black Go_players.blackhold);
+  assert_equal true (Go_players.is_consistent Go_players.blackhold Go_players.black);
+  assert_equal false (Go_players.is_consistent Go_players.white Go_players.black);
+  assert_equal false (Go_players.is_consistent Go_players.empty Go_players.blackhold)
 
 let suite =
-  "Board Test Suite" >:::
+  "Go Test Suite" >:::
   [
-    "test_get_neighbours" >:: test_get_neighbours;
-    "test_valid_coordinate" >:: test_valid_coordinate;
-    "test_get_board" >:: test_get_board;
+    "Board Test Suite" >:::
+    [
+      "test_get_neighbours" >:: test_get_neighbours;
+      "test_valid_coordinate" >:: test_valid_coordinate;
+      "test_get_board" >:: test_get_board;
+      "test_print_board" >:: test_print_board;
+    ];
+    "Go_players Test Suite" >:::
+    [
+      "test_empty" >:: test_is_empty;
+      "test_is_blank" >:: test_is_blank;
+      "test_is_white" >:: test_is_white;
+      "test_is_same" >:: test_is_same;
+      "test_is_consistent" >:: test_is_consistent;
+    ];
   ]
 
 let () =
