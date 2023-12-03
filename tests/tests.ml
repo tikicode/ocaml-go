@@ -26,11 +26,24 @@ let test_valid_coordinate _ =
   let invalid_both = Board.valid_coordinate test_board (-1, 6) in
   assert_equal ~msg:"Invalid coordinate (-1, 6)" false invalid_both
 
+  let test_get_board _ =
+    let board_size = 3 in
+    let test_board = Board.init_board board_size in
+    let expected_board =
+      [(2, 2); (2, 1); (2, 0); (1, 2); (1, 1); (1, 0); (0, 2); (0, 1); (0, 0)]
+    in
+    let result_board = Board.get_board test_board in
+    assert_equal ~msg:"Incorrect board" ~printer:(fun lst ->
+        Printf.sprintf "[%s]" (String.concat "; " (List.map (fun (x, y) -> Printf.sprintf "(%d, %d)" x y) lst)))
+      expected_board
+      result_board
+
 let suite =
   "Board Test Suite" >:::
   [
     "test_get_neighbours" >:: test_get_neighbours;
-    "test_valid_coordinate" >:: test_valid_coordinate
+    "test_valid_coordinate" >:: test_valid_coordinate;
+    "test_get_board" >:: test_get_board;
   ]
 
 let () =
