@@ -1,9 +1,9 @@
-# dune exec -- ./dream_routes.exe
+# dune build
 # OCAMLPARAM: unset
 # Shared cache: disabled
 # Workspace root: /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go
 # Auto-detected concurrency: 8
-$ /Users/johndaviddelucia/.opam/5.0.0/bin/ocamlc.opt -config > /var/folders/b_/6vj9qcl12t5477qfv33hnb140000gn/T/dune_7963d7_output
+$ /Users/johndaviddelucia/.opam/5.0.0/bin/ocamlc.opt -config > /var/folders/b_/6vj9qcl12t5477qfv33hnb140000gn/T/dune_6627ef_output
 # Dune context:
 #  { name = "default"
 #  ; kind = "default"

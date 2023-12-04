@@ -1,8 +1,9 @@
-Project Milestone 1: Go
---------------------------------
+## Project Milestone 1: Go
 
 ### Rules
+
 The following rules are either copied or adapted from "The Rules and Elements of Go" by James Davies.
+
 - The board is empty at the onset of the game (unless players agree to place a handicap).
 - Black makes the first move, after which White and Black alternate.
 - A move consists of placing one stone of one's own color on an empty intersection on the board.
@@ -10,38 +11,42 @@ The following rules are either copied or adapted from "The Rules and Elements of
 - A stone or solidly connected group of stones of one color is captured and removed from the board when all the intersections directly adjacent to it are occupied by the enemy. (Capture of the enemy takes precedence over self-capture.)
 - No stone may be played so as to recreate a former board position.
 - The end of the game is reached when neither player can place down a piece without losing it
-or if there is a player with significantly more area than the other player. The game end is 
-typically determined by both players before all positions on the board are occupied. 
+  or if there is a player with significantly more area than the other player. The game end is
+  typically determined by both players before all positions on the board are occupied.
 - A player's area consists of all the points the player has either occupied or surrounded.
 - The player with more area wins.
 
 ### Usage
-Create a simple implementation of Go game in OCaml. This is the first part of a project. The game have two players - white pieces and black pieces. The starting state should be an empty board of 16 * 16 that looks like the following:
+
+To use the api: enter into bin/ and run 'dune build', followed by 'dune exec -- ./dream_routes.exe'
+To use the frontend: enter into lib/go-frontend and run 'npm run build', followed by npm start.
+
+Create a simple implementation of Go game in OCaml. This is the first part of a project. The game have two players - white pieces and black pieces. The starting state should be an empty board of 16 \* 16 that looks like the following:
 
 ```
-     1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 
- 1 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ] 
- 2 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ] 
+     1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
+ 1 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
+ 2 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  3 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
- 4 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ] 
- 5 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ] 
- 6 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ] 
+ 4 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
+ 5 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
+ 6 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  7 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
- 8 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ] 
- 9 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ] 
-10 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ] 
-11 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ] 
-12 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ] 
-13 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ] 
-14 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ] 
-15 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ] 
-16 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ] 
+ 8 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
+ 9 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
+10 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
+11 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
+12 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
+13 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
+14 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
+15 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
+16 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
 ```
 
 In each iteration, prompt the user to input a set of two numbers x y that represents the column and row of the location where they intend to place their move. A legal move can only be made in a position that is currently empty and not outside the bounds of the board. For example, an input of 2 2 will result in :
 
 ```
-    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 
+    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
  1 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  2 [ ][B][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  3 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
@@ -60,14 +65,14 @@ In each iteration, prompt the user to input a set of two numbers x y that repres
 16 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
 ```
 
-Once one player has made its move, it is the other player's turn. 
+Once one player has made its move, it is the other player's turn.
 For example, an additional input of 2 3 will result in:
 
 ```
-    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 
+    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
  1 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  2 [ ][B][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
- 3 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ] 
+ 3 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  5 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  6 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  7 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
@@ -85,7 +90,7 @@ For example, an additional input of 2 3 will result in:
 This continues until the program is exited. If a player's pieces are surrounded on all sides by the other player's pieces, then they are taken off the board. For example, in the board:
 
 ```
-    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16  
+    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
  1 [ ][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  2 [W][B][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  3 [W][B][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
@@ -107,7 +112,7 @@ This continues until the program is exited. If a player's pieces are surrounded 
 If the white player inputs 3 1, the result would be:
 
 ```
-    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 
+    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
  1 [ ][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  2 [W][ ][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  3 [W][ ][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
@@ -130,7 +135,7 @@ Note the the pieces would be taken off if they are at the boundaries too.
 For example:
 
 ```
-    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 
+    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
  1 [W][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  2 [W][B][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  3 [W][B][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
@@ -153,7 +158,7 @@ Following the white move if the black player inputs 1 3, the board
 will look like this:
 
 ```
-    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 
+    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
  1 [ ][ ][B][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  2 [ ][B][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  3 [ ][B][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
@@ -175,7 +180,7 @@ will look like this:
 Here are some additional cases to consider:
 
 ```
-    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16  
+    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
  1 [B][B][B][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  2 [B][B][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  3 [B][B][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
@@ -195,7 +200,7 @@ Here are some additional cases to consider:
 
 Player W, enter the row and column (e.g., '2 2') to place your piece: 5 3
 
-    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16  
+    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
  1 [ ][ ][ ][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  2 [ ][ ][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  3 [ ][ ][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
@@ -214,13 +219,15 @@ Player W, enter the row and column (e.g., '2 2') to place your piece: 5 3
 16 [ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
 
 ```
+
 At the end of the game, calculate the score of both players by counting the area they captured(surrounded on all sides)
 
 #### Example 1
+
 Consider this board:
 
 ```
-    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16  
+    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
  1 [ ][ ][ ][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  2 [ ][ ][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  3 [ ][ ][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
@@ -242,7 +249,7 @@ Consider this board:
 In the board above, white's score would be:
 
 ```
-    1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  
+    1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16
  1 [1 ][2 ][3 ][4 ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ]
  2 [5 ][6 ][7 ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ]
  3 [8 ][9 ][10][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ]
@@ -264,8 +271,9 @@ In the board above, white's score would be:
 ```
 
 #### Example 2
+
 ```
-    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16  
+    1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
  1 [ ][ ][ ][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  2 [ ][ ][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
  3 [ ][ ][W][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
@@ -285,8 +293,9 @@ In the board above, white's score would be:
 ```
 
 In the board above, white's score would be:
+
 ```
-    1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16 
+    1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16
  1 [1 ][2 ][3 ][4 ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ]
  2 [5 ][6 ][7 ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ]
  3 [8 ][9 ][10][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ]
@@ -308,8 +317,9 @@ In the board above, white's score would be:
 ```
 
 Black's score would be:
+
 ```
-    1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16 
+    1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16
  1 [  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ]
  2 [  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ]
  3 [  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ]
@@ -329,8 +339,9 @@ Black's score would be:
 
 10 points
 ```
+
 so the winner is white
 
-
 ### Code Style
+
 Do not use mutations

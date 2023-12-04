@@ -8,18 +8,22 @@ type data = {
 }
 [@@deriving yojson]
 
-(* type input_data = {
-  input: string;
-}
-[@@deriving yojson] *)
+type data_list = data list [@@deriving yojson]
+
+let create_data_list : data_list =
+  [
+    {message = "Hello"};
+    {message = "World"};
+  ]
 
 let api_handler _req =
   let data = { message = "Hello, Dream API!" } in
   Dream.json (Yojson.Safe.to_string (data_to_yojson data))
 
-let post_handler request =
-  let%lwt body = Dream.body request in
-  Dream.html (Printf.sprintf "Received POST request with body: %s" body)
+let post_handler _ =
+  (* let%lwt body = Dream.body request in *)
+  Dream.json (Yojson.Safe.to_string (data_list_to_yojson create_data_list))
+  (* (Printf.sprintf "Received POST request with body: %s" body) *)
 
 let () =
   Dream.run 
