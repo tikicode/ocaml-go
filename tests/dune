@@ -1,0 +1,5 @@
+(test
+ (name tests)
+ (libraries go core ounit2)
+ (modules tests)
+)

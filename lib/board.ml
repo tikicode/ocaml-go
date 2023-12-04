@@ -10,6 +10,9 @@ module Board = struct
     in
     { board; size }
 
+  let return_list (bd : t) : Go_players.t list list = 
+    bd.board
+
   let print_board (bd : t) : unit =
     let rec print_rows (board : Go_players.t list list) (n : int) : unit =
       match board with

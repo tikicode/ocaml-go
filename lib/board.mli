@@ -4,6 +4,7 @@ module Board : sig
   type t
 
   val init_board : int -> t
+  val return_list : t -> Players.Go_players.t list list
   val print_board : t -> unit
   val valid_coordinate : t -> int * int -> bool
   val get_neighbours : t -> int * int -> (int * int) list
