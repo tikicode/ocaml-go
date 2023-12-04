@@ -34,6 +34,25 @@ let test_get_neighbours _ =
   let expected_neighbors = [(0, 1); (2, 1); (1, 0); (1, 2)] in
   assert_equal expected_neighbors neighbors
 
+let test_update_board _ =
+  let initial_size = 3 in
+  let initial_board = Board.init_board initial_size in
+  let updated_board = Board.update_board initial_board (1, 1) Go_players.white in
+
+  (* Check that the player at (1, 1) is now player1 *)
+  let result_player = Board.get_player updated_board (1, 1) in
+  assert_equal Go_players.white result_player;
+
+  (* Check that other positions remain unchanged *)
+  for i = 0 to initial_size - 1 do
+    for j = 0 to initial_size - 1 do
+      if (i, j) <> (1, 1) then
+        let original_player = Board.get_player initial_board (i, j) in
+        let updated_player = Board.get_player updated_board (i, j) in
+        assert_equal original_player updated_player;
+    done;
+  done
+
 let test_valid_coordinate _ =
   let board_size = 5 in
   let test_board = Board.init_board board_size in
@@ -143,6 +162,7 @@ let suite =
       "test_get_board" >:: test_get_board;
       "test_print_board" >:: test_print_board;
       "test_init_board" >:: test_init_board;
+      "test_update_board" >:: test_update_board;
     ];
     "Go_players Test Suite" >:::
     [
