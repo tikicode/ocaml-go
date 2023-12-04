@@ -11,8 +11,7 @@ module Game_controller : sig
   val update_game : Board.t -> Go_players.t -> int -> int -> int -> t
   val check_coords : Board.t -> int * int -> bool
 
-  val dfs :
-    Board.t -> Go_players.t -> (int * int, 'a) Set.t -> (int * int) list -> bool
+  val dfs : Board.t -> Go_players.t -> (int * int, 'a) Set.t -> (int * int) list -> bool
 
   val is_alive : Board.t -> Go_players.t -> int * int -> bool
   val check_move : Board.t -> Go_players.t -> int * int -> bool

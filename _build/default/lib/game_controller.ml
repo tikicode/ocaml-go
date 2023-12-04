@@ -117,6 +117,10 @@ module Game_controller = struct
     in
     (new_board, List.length deads)
 
+  let return_dead (player : Go_players.t) (bd : Board.t) : (int * int) list = 
+    let coords = Board.get_board bd in
+      List.filter coords ~f:(fun coord -> not (is_alive bd player coord))
+
   let rec run { bd; player; black_slots; white_slots } =
     if check_done player black_slots white_slots then game_done bd 0 0
     else (

@@ -1,0 +1,24 @@
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: Start test Go Test Suite:0:Board Test Suite:0:test_get_neighbours.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: Test Go Test Suite:0:Board Test Suite:0:test_get_neighbours is successful.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: End test Go Test Suite:0:Board Test Suite:0:test_get_neighbours.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: Start test Go Test Suite:0:Board Test Suite:2:test_get_board.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: Test Go Test Suite:0:Board Test Suite:2:test_get_board is successful.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: End test Go Test Suite:0:Board Test Suite:2:test_get_board.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: Start test Go Test Suite:0:Board Test Suite:4:test_init_board.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: Test Go Test Suite:0:Board Test Suite:4:test_init_board is successful.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: End test Go Test Suite:0:Board Test Suite:4:test_init_board.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: Start test Go Test Suite:0:Board Test Suite:5:test_update_board.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: Test Go Test Suite:0:Board Test Suite:5:test_update_board is successful.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: End test Go Test Suite:0:Board Test Suite:5:test_update_board.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: Start test Go Test Suite:1:Go_players Test Suite:2:test_is_white.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: Test Go Test Suite:1:Go_players Test Suite:2:test_is_white is successful.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: End test Go Test Suite:1:Go_players Test Suite:2:test_is_white.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: Start test Go Test Suite:1:Go_players Test Suite:3:test_is_same.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: Test Go Test Suite:1:Go_players Test Suite:3:test_is_same is successful.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: End test Go Test Suite:1:Go_players Test Suite:3:test_is_same.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: Start test Go Test Suite:1:Go_players Test Suite:6:test_opposite.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: Test Go Test Suite:1:Go_players Test Suite:6:test_opposite is successful.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: End test Go Test Suite:1:Go_players Test Suite:6:test_opposite.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: Start test Go Test Suite:1:Go_players Test Suite:7:test_hold.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: Test Go Test Suite:1:Go_players Test Suite:7:test_hold is successful.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#01 I: End test Go Test Suite:1:Go_players Test Suite:7:test_hold.

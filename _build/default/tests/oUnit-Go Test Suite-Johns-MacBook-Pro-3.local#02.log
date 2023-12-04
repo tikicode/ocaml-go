@@ -1,0 +1,21 @@
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#02 I: Start test Go Test Suite:0:Board Test Suite:1:test_valid_coordinate.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#02 I: Test Go Test Suite:0:Board Test Suite:1:test_valid_coordinate is successful.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#02 I: End test Go Test Suite:0:Board Test Suite:1:test_valid_coordinate.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#02 I: Start test Go Test Suite:0:Board Test Suite:3:test_print_board.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#02 I: Test Go Test Suite:0:Board Test Suite:3:test_print_board is successful.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#02 I: End test Go Test Suite:0:Board Test Suite:3:test_print_board.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#02 I: Start test Go Test Suite:1:Go_players Test Suite:0:test_empty.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#02 I: Test Go Test Suite:1:Go_players Test Suite:0:test_empty is successful.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#02 I: End test Go Test Suite:1:Go_players Test Suite:0:test_empty.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#02 I: Start test Go Test Suite:1:Go_players Test Suite:1:test_is_blank.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#02 I: Test Go Test Suite:1:Go_players Test Suite:1:test_is_blank is successful.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#02 I: End test Go Test Suite:1:Go_players Test Suite:1:test_is_blank.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#02 I: Start test Go Test Suite:1:Go_players Test Suite:4:test_is_consistent.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#02 I: Test Go Test Suite:1:Go_players Test Suite:4:test_is_consistent is successful.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#02 I: End test Go Test Suite:1:Go_players Test Suite:4:test_is_consistent.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#02 I: Start test Go Test Suite:1:Go_players Test Suite:5:test_to_char.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#02 I: Test Go Test Suite:1:Go_players Test Suite:5:test_to_char is successful.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#02 I: End test Go Test Suite:1:Go_players Test Suite:5:test_to_char.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#02 I: Start test Go Test Suite:1:Go_players Test Suite:8:test_to_string.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#02 I: Test Go Test Suite:1:Go_players Test Suite:8:test_to_string is successful.
+2023-12-04T21:27:42+00:00 Johns-MacBook-Pro-3.local#02 I: End test Go Test Suite:1:Go_players Test Suite:8:test_to_string.
