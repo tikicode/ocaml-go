@@ -3,6 +3,29 @@ open Go
 open Board
 open Players
 
+let test_init_board _ =
+  let bd = Board.return_list (Board.init_board 3) in
+  let expected_board =
+    [
+      [ Go_players.empty; Go_players.empty; Go_players.empty ];
+      [ Go_players.empty; Go_players.empty; Go_players.empty ];
+      [ Go_players.empty; Go_players.empty; Go_players.empty ];
+    ]
+  in
+  assert_equal expected_board bd;
+
+  let bd2 = Board.return_list (Board.init_board 5) in 
+  let expected_board2 = 
+    [
+      [Go_players.empty; Go_players.empty; Go_players.empty; Go_players.empty; Go_players.empty];
+      [Go_players.empty; Go_players.empty; Go_players.empty; Go_players.empty; Go_players.empty];
+      [Go_players.empty; Go_players.empty; Go_players.empty; Go_players.empty; Go_players.empty];
+      [Go_players.empty; Go_players.empty; Go_players.empty; Go_players.empty; Go_players.empty];
+      [Go_players.empty; Go_players.empty; Go_players.empty; Go_players.empty; Go_players.empty];
+    ]
+  in 
+  assert_equal expected_board2 bd2
+
 let test_get_neighbours _ =
   let board_size = 3 in
   let test_board = Board.init_board board_size in
@@ -119,6 +142,7 @@ let suite =
       "test_valid_coordinate" >:: test_valid_coordinate;
       "test_get_board" >:: test_get_board;
       "test_print_board" >:: test_print_board;
+      "test_init_board" >:: test_init_board;
     ];
     "Go_players Test Suite" >:::
     [
