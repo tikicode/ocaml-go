@@ -38,10 +38,14 @@ let test_update_board _ =
   let initial_size = 3 in
   let initial_board = Board.init_board initial_size in
   let updated_board = Board.update_board initial_board (1, 1) Go_players.white in
+  let updated_board2 = Board.update_board initial_board (1, 1) Go_players.black in
 
   (* Check that the player at (1, 1) is now player1 *)
   let result_player = Board.get_player updated_board (1, 1) in
   assert_equal Go_players.white result_player;
+
+  let result_player2 = Board.get_player updated_board2 (1, 1)in
+  assert_equal Go_players.black result_player2;
 
   (* Check that other positions remain unchanged *)
   for i = 0 to initial_size - 1 do
