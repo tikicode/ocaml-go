@@ -27,7 +27,7 @@ module Game_controller = struct
     in
     Printf.printf "\nThe score of player Black is: %d\n" black_score ;
     Printf.printf "The score of player White is: %d\n" white_score ;
-    
+
     if black_score > white_score then
       Printf.printf "Player Black wins!\n"
     else if black_score < white_score then
@@ -36,7 +36,7 @@ module Game_controller = struct
       Printf.printf "It's a tie!\n"
 
   let check_done (player : Go_players.t) (black_slots : int) (white_slots : int)
-      : bool =
+    : bool =
     if Go_players.is_white player then white_slots <= 0 else black_slots <= 0
 
   let update_game (bd : Board.t) (player : Go_players.t) (black_slots : int)
@@ -81,19 +81,19 @@ module Game_controller = struct
     | [] -> false
     | coord :: st when Set.mem visited coord -> dfs board player visited st
     | coord :: st ->
-        let p = Board.get_player board coord in
-        if Go_players.is_blank p then true
-        else if not (Go_players.is_same player p) then
-          dfs board player visited st
-        else
-          let neighbours = Board.get_neighbours board coord in
-          let unvisited =
-            List.filter neighbours ~f:(fun c -> not (Set.mem visited c))
-          in
-          dfs board player (Set.add visited coord) (unvisited @ st)
+      let p = Board.get_player board coord in
+      if Go_players.is_blank p then true
+      else if not (Go_players.is_same player p) then
+        dfs board player visited st
+      else
+        let neighbours = Board.get_neighbours board coord in
+        let unvisited =
+          List.filter neighbours ~f:(fun c -> not (Set.mem visited c))
+        in
+        dfs board player (Set.add visited coord) (unvisited @ st)
 
   let is_alive (bd : Board.t) (player : Go_players.t) (coord : int * int) : bool
-      =
+    =
     let p = Board.get_player bd coord in
     if Go_players.is_blank p then true
     else if Go_players.is_same player p then true
@@ -102,7 +102,7 @@ module Game_controller = struct
       dfs bd p set [ coord ]
 
   let check_move (bd : Board.t) (player : Go_players.t) (coord : int * int) :
-      bool =
+    bool =
     is_alive bd (Go_players.opposite player) coord
 
   let take_pieces (player : Go_players.t) (bd : Board.t) : Board.t * int =
@@ -119,7 +119,34 @@ module Game_controller = struct
 
   let return_dead (player : Go_players.t) (bd : Board.t) : (int * int) list = 
     let coords = Board.get_board bd in
-      List.filter coords ~f:(fun coord -> not (is_alive bd player coord))
+    List.filter coords ~f:(fun coord -> not (is_alive bd player coord))
+
+  let rec run2 (bd : Board.t) (player : Go_players.t) (black_slots : int) (white_slots : int) (inputs : string) : unit=
+    if check_done player black_slots white_slots then game_done bd 0 0
+    else (
+      match inputs with
+      | input -> (
+          match String.split_on_chars input ~on:[ ' ' ] with
+          | [ s1; s2 ] -> (
+              match (int_of_string_opt s1, int_of_string_opt s2) with
+              | Some row, Some col ->
+                let coord = (row - 1, col - 1) in
+                if check_coords bd coord then
+                  let new_board = Board.update_board bd coord player in
+                  let occupied_board, pieces = take_pieces player new_board in
+                  if check_move occupied_board player coord then
+                    let new_game_state = update_game occupied_board player black_slots
+                    white_slots pieces in
+                    run2
+                      (new_game_state.bd) (new_game_state.player)(new_game_state.black_slots)(new_game_state.white_slots)(inputs)
+                  else (
+      
+                    run2 (bd)(player)(black_slots)(white_slots)(inputs))
+                else run2 (bd)(player)(black_slots)(white_slots)(inputs)
+              | _ ->
+                run2 (bd)(player)(black_slots)(white_slots)(inputs))
+          | _ ->
+            run2 (bd)(player)(black_slots)(white_slots)(inputs)))
 
   let rec run { bd; player; black_slots; white_slots } =
     if check_done player black_slots white_slots then game_done bd 0 0
@@ -137,23 +164,24 @@ module Game_controller = struct
           | [ s1; s2 ] -> (
               match (int_of_string_opt s1, int_of_string_opt s2) with
               | Some row, Some col ->
-                  let coord = (row - 1, col - 1) in
-                  if check_coords bd coord then
-                    let new_board = Board.update_board bd coord player in
-                    let occupied_board, pieces = take_pieces player new_board in
-                    if check_move occupied_board player coord then
-                      run
-                        (update_game occupied_board player black_slots
-                           white_slots pieces)
-                    else (
-                      print_string "The position will make your piece(s) dead\n";
-                      run { bd; player; black_slots; white_slots })
-                  else run { bd; player; black_slots; white_slots }
+                let coord = (row - 1, col - 1) in
+                if check_coords bd coord then
+                  let new_board = Board.update_board bd coord player in
+                  let occupied_board, pieces = take_pieces player new_board in
+                  if check_move occupied_board player coord then
+                    run
+                      (update_game occupied_board player black_slots
+                         white_slots pieces)
+                  else (
+                    print_string "The position will make your piece(s) dead\n";
+                    run { bd; player; black_slots; white_slots })
+                else run { bd; player; black_slots; white_slots }
               | _ ->
-                  print_string "Invalid input.\n";
-                  run { bd; player; black_slots; white_slots })
+                print_string "Invalid input.\n";
+                run { bd; player; black_slots; white_slots })
           | _ ->
-              print_string
-                "Invalid input format. Please enter coordinates as 'row col'.\n";
-              run { bd; player; black_slots; white_slots }))
+            print_string
+              "Invalid input format. Please enter coordinates as 'row col'.\n";
+            run { bd; player; black_slots; white_slots }))
+
 end
