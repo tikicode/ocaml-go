@@ -3,6 +3,8 @@
     Dream.html "Hello world!") *)
 
 
+
+
 type data = {
   message: string;
 }
@@ -16,18 +18,30 @@ let create_data_list : data_list =
     {message = "World"};
   ]
 
-let api_handler _req =
-  let data = { message = "Hello, Dream API!" } in
-  Dream.json (Yojson.Safe.to_string (data_to_yojson data))
-
 let post_handler _ =
   (* let%lwt body = Dream.body request in *)
-  Dream.json (Yojson.Safe.to_string (data_list_to_yojson create_data_list))
+  let headers = [
+    "Access-Control-Allow-Origin", "*";
+    "Access-Control-Allow-Methods", "GET, POST, OPTIONS";
+    "Access-Control-Allow-Headers", "Content-Type";
+  ] in
+  Dream.json ~headers (Yojson.Safe.to_string (data_list_to_yojson create_data_list))
   (* (Printf.sprintf "Received POST request with body: %s" body) *)
+
+let api_handler _ = 
+  let headers = [
+    "Access-Control-Allow-Origin", "*";
+    "Access-Control-Allow-Methods", "GET, POST, OPTIONS";
+    "Access-Control-Allow-Headers", "Content-Type";
+  ] in
+  let data = { message = "Hello, Dream API!" } in
+  Dream.json ~headers (Yojson.Safe.to_string (data_to_yojson data))
+
 
 let () =
   Dream.run 
   @@ Dream.logger
+  
   @@ Dream.router [
     Dream.get "/api" api_handler;
   
