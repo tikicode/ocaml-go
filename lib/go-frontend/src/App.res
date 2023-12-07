@@ -1,7 +1,5 @@
 %%raw(`import './App.css'`)
 
-let apiUrl = "http://localhost:8080/api"
-
 // module Response = {
 //   type t<'data>
 //   @send external json: t<'data> => Promise.t<'data> = "json"
@@ -22,14 +20,6 @@ let apiUrl = "http://localhost:8080/api"
 // type res = response<moves>
 
 // @val external fetch: (string, 'params) => Promise.t<Response.t<res>> = "fetch"
-
-let makeRequest = %raw(`
-  async function (apiUrl) {
-    const response = await fetch(apiUrl, {method: "GET", cache: "no-cache",});
-    const helloWorld = await response.json();
-    console.log(helloWorld);
-  }
-`)
 
 // let makeRequest = async url => {
 //   open Promise
@@ -92,12 +82,18 @@ let findOffset = (x, y, left, right, top, bottom, squareSize) => {
   }
 }
 
-let updateGameBoard = (event, whiteToPlay, findOffset, response) => {
+let updateGameBoard = (event, whiteToPlay, findOffset, row, col) => {
   let mouseX = event->ReactEvent.Mouse.clientX
   let mouseY = event->ReactEvent.Mouse.clientY
   let squareSize = 26.203125
   let partialFunCoordinates = %raw(`
-    function(event, tempWhiteToPlay, mouseX, mouseY, squareSize, findOffset) {
+    function(event, tempWhiteToPlay, mouseX, mouseY, squareSize, findOffset, row, col) {
+      let true_row = Math.abs(mouseY - event.target.getBoundingClientRect().top) < Math.abs(mouseY - event.target.getBoundingClientRect().bottom) ? row : row+1;
+      let true_col = Math.abs(mouseX - event.target.getBoundingClientRect().left) < Math.abs(mouseX - event.target.getBoundingClientRect().right) ? col : col+1;
+      let start = "http://localhost:8080/start";
+      let move = "http://localhost:8080/move";
+      let to_remove = makeRequest(move);
+
       function createPiece() {
         var target = event.target;
         var offset = findOffset(mouseX, mouseY, target.getBoundingClientRect().left, target.getBoundingClientRect().right, target.getBoundingClientRect().top, target.getBoundingClientRect().bottom, squareSize);
@@ -130,6 +126,19 @@ let updateGameBoard = (event, whiteToPlay, findOffset, response) => {
           divToRemove.remove();
         }
       }
+      async function makeRequest(apiUrl, row, col) {
+      console.log("HIT");
+      const response = await fetch(apiUrl, {
+        method: "POST", // Change method to "POST"
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: "{}", // Properly stringify the object
+      });
+      const helloWorld = await response.json();
+      console.log(helloWorld);
+      }
     }
   `)
   let boundingBox = partialFunCoordinates(
@@ -139,6 +148,8 @@ let updateGameBoard = (event, whiteToPlay, findOffset, response) => {
     mouseY,
     squareSize,
     findOffset,
+    row,
+    col,
   )
   Js.log(boundingBox)
   whiteToPlay := !whiteToPlay.contents
@@ -151,10 +162,8 @@ let makeGrid = (~rows, ~cols) => {
   rowArray->Belt.List.map(row =>
     colArray->Belt.List.map(col => {
       let handleClick = event => {
-        let response = makeRequest(apiUrl)
-        updateGameBoard(event, whiteToPlay, findOffset, response)
+        updateGameBoard(event, whiteToPlay, findOffset, row, col)
       }
-      // let handleClick = event => makeRequest(apiUrl)
 
       <div key={string_of_int(row * cols + col)} className="intersection" onClick={handleClick} />
     })
