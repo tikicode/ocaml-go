@@ -4,7 +4,8 @@ open Core
 
 module Game_controller : sig
   type t
-  val get_dead_pieces : t -> (int * int) list
+  (* val get_dead_pieces : t -> (int * int) list *)
+  val get_dead_pieces : t -> string -> (int * int) list
   val init_game : int -> Go_players.t -> t
   val game_done : Board.t -> int -> int -> unit
   val check_done : Go_players.t -> int -> int -> bool
@@ -18,5 +19,7 @@ module Game_controller : sig
   val take_pieces : Go_players.t -> Board.t -> Board.t * int
   val return_dead : Go_players.t -> Board.t -> (int * int) list
   val run : t -> unit
-  val run2 : t -> string -> t
+  (* val run2 : t -> string -> t *)
+  val run3 : t -> string -> t
+
 end

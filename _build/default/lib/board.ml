@@ -53,6 +53,7 @@ module Board = struct
     let new_row = cols_before @ (p :: cols_after) in
     { board = rows_before @ (new_row :: rows_after); size }
 
+
   let get_board (bd : t) : (int * int) list =
     let rec aux (x : int) (y : int) (coords : (int * int) list) :
         (int * int) list =

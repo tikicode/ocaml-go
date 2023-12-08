@@ -90,6 +90,10 @@ let updateGameBoard = (event, whiteToPlay, findOffset, row, col) => {
     function(event, tempWhiteToPlay, mouseX, mouseY, squareSize, findOffset, row, col) {
       let true_row = Math.abs(mouseY - event.target.getBoundingClientRect().top) < Math.abs(mouseY - event.target.getBoundingClientRect().bottom) ? row : row+1;
       let true_col = Math.abs(mouseX - event.target.getBoundingClientRect().left) < Math.abs(mouseX - event.target.getBoundingClientRect().right) ? col : col+1;
+      console.log(true_row);
+      console.log(true_col);
+
+
       let move = "http://localhost:8080/move";
       let to_remove = makeMove(move);
 
@@ -111,7 +115,7 @@ let updateGameBoard = (event, whiteToPlay, findOffset, row, col) => {
           newDiv.style.background = "white";
         } else {
           newDiv.style.background = "black";
-          removePiece([-10.0, -10.0]);
+          // removePiece([-10.0, -10.0]);
         }
         // Append the div to the document body
         document.body.appendChild(newDiv);
@@ -130,7 +134,7 @@ let updateGameBoard = (event, whiteToPlay, findOffset, row, col) => {
         const response = await fetch(apiUrl, {
           method: "POST", 
           cache: "no-cache",
-          body: {"pair": true_row + " " + true_col}, 
+          body: (true_row+1) + " " + (true_col+1), 
         });
         const removePieces = await response.json();
         console.log(removePieces);

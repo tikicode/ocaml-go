@@ -122,7 +122,7 @@ module Game_controller = struct
     let coords = Board.get_board bd in
     List.filter coords ~f:(fun coord -> not (is_alive bd player coord))
   
-  let get_dead_pieces ({bd; player; _}) = return_dead (player) (bd)
+  (*let get_dead_pieces ({bd; player; _}) = return_dead (player) (bd)
 
   let run2 { bd; player; black_slots; white_slots } (inputs : string) : t =
       match inputs with
@@ -147,7 +147,45 @@ module Game_controller = struct
               | _ ->
                 ({ bd; player; black_slots; white_slots }))
           | _ ->
-            ({ bd; player; black_slots; white_slots }))
+            ({ bd; player; black_slots; white_slots })) *)
+
+  let get_dead_pieces { bd; player;_ } (inputs : string) : (int * int) list =
+    match (String.split_on_chars inputs ~on:[ ' ' ]) with
+    | [s1; s2 ] -> 
+        (match (int_of_string_opt s1, int_of_string_opt s2) with
+        | Some row, Some col ->
+          let coord = (row-1, col-1) in
+          if check_coords bd coord then (
+            (* let new_board = Board.update_board bd coord player in *)
+            let _ =
+               Board.update_board bd coord player in
+              (* return_dead player new_board) *)
+              [(1,2);(3,4)]
+          )
+            else [(7,8)]
+        | _ -> [(9,10)])
+    | _ -> [(1,5);(3,5)]
+      
+  let run3 { bd; player; black_slots; white_slots } (inputs : string) : t =
+    match inputs with
+    | input -> (
+        match String.split_on_chars input ~on:[ ' ' ] with
+        | [ s1; s2 ] -> (
+            match (int_of_string_opt s1, int_of_string_opt s2) with
+            | Some row, Some col ->
+              let coord = (row - 1, col - 1) in
+              if check_coords bd coord then
+                let new_board = Board.update_board bd coord player in
+                let occupied_board, pieces = take_pieces player new_board in
+                if check_move occupied_board player coord then
+                  let updated = (update_game occupied_board player black_slots white_slots pieces) in 
+                  Board.print_board updated.bd; updated
+                else ({ bd; player; black_slots; white_slots })
+              else ({ bd; player; black_slots; white_slots })
+            | _ ->
+              ({ bd; player; black_slots; white_slots }))
+        | _ ->
+          ({ bd; player; black_slots; white_slots }))
 
   let rec run { bd; player; black_slots; white_slots } =
     if check_done player black_slots white_slots then game_done bd 0 0
@@ -165,9 +203,10 @@ module Game_controller = struct
           | [ s1; s2 ] -> (
               match (int_of_string_opt s1, int_of_string_opt s2) with
               | Some row, Some col ->
-                let coord = (row - 1, col - 1) in
+                let coord = (row, col - 1) in
                 if check_coords bd coord then
                   let new_board = Board.update_board bd coord player in
+                  Board.print_board new_board;
                   let occupied_board, pieces = take_pieces player new_board in
                   if check_move occupied_board player coord then
                     run

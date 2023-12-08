@@ -17,7 +17,7 @@ type game_state = {
 }
   
 let game_state : game_state = {
-  game = Game_controller.init_game 16 Go_players.black;
+  game = Game_controller.init_game 20 Go_players.black;
 }
 
 let move_handler req =
@@ -27,9 +27,10 @@ let move_handler req =
     "Access-Control-Allow-Methods", "GET, POST, OPTIONS";
     "Access-Control-Allow-Headers", "Content-Type";
   ] in
-  game_state.game <- (Game_controller.run2 game_state.game move);
-  let removed_pieces = Game_controller.get_dead_pieces (game_state.game) in 
+  let removed_pieces = Game_controller.get_dead_pieces (game_state.game) move in 
+  game_state.game <- (Game_controller.run3 game_state.game move);
   Dream.json ~headers (Yojson.Safe.to_string (data_list_to_yojson removed_pieces))
+
   (* (Printf.sprintf "Received POST request with body: %s" body) *)
 
 let start_handler _ = 
@@ -38,7 +39,7 @@ let start_handler _ =
     "Access-Control-Allow-Methods", "GET, POST, OPTIONS";
     "Access-Control-Allow-Headers", "Content-Type";
   ] in
-  game_state.game <- Game_controller.run2 game_state.game "20 20";
+  game_state.game <- Game_controller.run3 game_state.game "21 21";
   let data = (1,2) in
   Dream.json ~headers (Yojson.Safe.to_string (data_to_yojson data))
 
