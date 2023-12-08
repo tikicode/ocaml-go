@@ -112,6 +112,7 @@ module Game_controller = struct
     let deads =
       List.filter coords ~f:(fun coord -> not (is_alive bd player coord))
     in
+    List.iter deads ~f:(fun (x, y) -> Printf.printf "(%d, %d)\n" x y);
     let new_board =
       List.fold deads ~init:bd ~f:(fun bd coord ->
           Board.update_board bd coord holden)
@@ -122,10 +123,9 @@ module Game_controller = struct
     let coords = Board.get_board bd in
     List.filter coords ~f:(fun coord -> not (is_alive bd player coord))
   
-  let get_dead_pieces ({ bd; player; _ } ) = return_dead player bd
-    (* return_dead (player) (bd) *)
+  let get_dead_pieces ({bd; player; _}) = return_dead (player) (bd)
 
-  let run2 { bd; player; black_slots; white_slots } (inputs : string) : t=
+  let run2 { bd; player; black_slots; white_slots } (inputs : string) : t =
       match inputs with
       | input -> (
           match String.split_on_chars input ~on:[ ' ' ] with
@@ -137,7 +137,8 @@ module Game_controller = struct
                   let new_board = Board.update_board bd coord player in
                   let occupied_board, pieces = take_pieces player new_board in
                   if check_move occupied_board player coord then
-                     (update_game occupied_board player black_slots white_slots pieces)
+                     let updated = (update_game occupied_board player black_slots white_slots pieces) in 
+                    Board.print_board updated.bd; updated
                   
                   (* in
                     run2

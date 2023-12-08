@@ -130,9 +130,10 @@ let updateGameBoard = (event, whiteToPlay, findOffset, row, col) => {
         const response = await fetch(apiUrl, {
           method: "POST", 
           cache: "no-cache",
-          body: {"field1": true_row, "field2": true_col}, 
+          body: {"pair": true_row + " " + true_col}, 
         });
         const removePieces = await response.json();
+        console.log(removePieces);
       }
     }
   `)
@@ -157,6 +158,7 @@ let updateGameBoard = (event, whiteToPlay, findOffset, row, col) => {
         cache: "no-cache",
       });
       const begin = await response.json();
+      console.log(begin);
     };
     startGame("http://localhost:8080/start");
 }`)

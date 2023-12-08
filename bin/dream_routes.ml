@@ -10,6 +10,8 @@ type data = (int*int)
 
 type data_list = data list [@@deriving yojson]
 
+(* let test_data_list : data_list = [(1, 2); (2,3); (1,5)] *)
+
 type game_state = {
   mutable game: Game_controller.t; 
 }
@@ -36,7 +38,7 @@ let start_handler _ =
     "Access-Control-Allow-Methods", "GET, POST, OPTIONS";
     "Access-Control-Allow-Headers", "Content-Type";
   ] in
-  Game_controller.run game_state.game;
+  game_state.game <- Game_controller.run2 game_state.game "20 20";
   let data = (1,2) in
   Dream.json ~headers (Yojson.Safe.to_string (data_to_yojson data))
 
