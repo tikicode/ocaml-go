@@ -18,8 +18,7 @@ module Game_controller : sig
   val check_move : Board.t -> Go_players.t -> int * int -> bool
   val take_pieces : Go_players.t -> Board.t -> Board.t * int
   val return_dead : Go_players.t -> Board.t -> (int * int) list
-  val run : t -> unit
-  (* val run2 : t -> string -> t *)
-  val run3 : t -> string -> t
+  val run_console : t -> unit
+  val run_two_player : t -> string -> t
 
 end

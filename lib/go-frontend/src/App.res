@@ -155,18 +155,6 @@ let updateGameBoard = (event, whiteToPlay, findOffset, row, col) => {
   whiteToPlay := !whiteToPlay.contents
 }
 
-%%raw(`{
-    async function startGame(apiUrl) {
-      const response = await fetch(apiUrl, {
-        method: "GET", 
-        cache: "no-cache",
-      });
-      const begin = await response.json();
-      console.log(begin);
-    };
-    startGame("http://localhost:8080/start");
-}`)
-
 let makeGrid = (~rows, ~cols) => {
   let rowArray = Belt.List.makeBy(rows, i => i)
   let colArray = Belt.List.makeBy(cols, i => i)

@@ -28,26 +28,16 @@ let move_handler req =
     "Access-Control-Allow-Headers", "Content-Type";
   ] in
   let removed_pieces = Game_controller.get_dead_pieces (game_state.game) move in 
-  game_state.game <- (Game_controller.run3 game_state.game move);
+  game_state.game <- (Game_controller.run_two_player game_state.game move);
   Dream.json ~headers (Yojson.Safe.to_string (data_list_to_yojson removed_pieces))
 
   (* (Printf.sprintf "Received POST request with body: %s" body) *)
 
-let start_handler _ = 
-  let headers = [
-    "Access-Control-Allow-Origin", "*";
-    "Access-Control-Allow-Methods", "GET, POST, OPTIONS";
-    "Access-Control-Allow-Headers", "Content-Type";
-  ] in
-  game_state.game <- Game_controller.run3 game_state.game "21 21";
-  let data = (1,2) in
-  Dream.json ~headers (Yojson.Safe.to_string (data_to_yojson data))
 
 let () =
   Dream.run 
   @@ Dream.logger
   @@ Dream.router [
-    Dream.get "/start" start_handler;
     
     Dream.post "/move" move_handler;
 
