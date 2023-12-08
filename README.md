@@ -20,6 +20,7 @@ The following rules are either copied or adapted from "The Rules and Elements of
 
 To use the api: enter into bin/ and run 'dune build', followed by 'dune exec -- ./dream_routes.exe'
 To use the frontend: enter into lib/go-frontend and run 'npm run build', followed by npm start.
+Use node version 17 and above
 
 Create a simple implementation of Go game in OCaml. This is the first part of a project. The game have two players - white pieces and black pieces. The starting state should be an empty board of 16 \* 16 that looks like the following:
 
