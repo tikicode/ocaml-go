@@ -90,9 +90,8 @@ let updateGameBoard = (event, whiteToPlay, findOffset, row, col) => {
     function(event, tempWhiteToPlay, mouseX, mouseY, squareSize, findOffset, row, col) {
       let true_row = Math.abs(mouseY - event.target.getBoundingClientRect().top) < Math.abs(mouseY - event.target.getBoundingClientRect().bottom) ? row : row+1;
       let true_col = Math.abs(mouseX - event.target.getBoundingClientRect().left) < Math.abs(mouseX - event.target.getBoundingClientRect().right) ? col : col+1;
-      let start = "http://localhost:8080/start";
       let move = "http://localhost:8080/move";
-      let to_remove = makeRequest(move);
+      let to_remove = makeMove(move);
 
       function createPiece() {
         var target = event.target;
@@ -126,18 +125,14 @@ let updateGameBoard = (event, whiteToPlay, findOffset, row, col) => {
           divToRemove.remove();
         }
       }
-      async function makeRequest(apiUrl, row, col) {
-      console.log("HIT");
-      const response = await fetch(apiUrl, {
-        method: "POST", // Change method to "POST"
-        cache: "no-cache",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: "{}", // Properly stringify the object
-      });
-      const helloWorld = await response.json();
-      console.log(helloWorld);
+      async function makeMove(apiUrl) {
+        console.log("Made Move");
+        const response = await fetch(apiUrl, {
+          method: "POST", 
+          cache: "no-cache",
+          body: {"field1": true_row, "field2": true_col}, 
+        });
+        const removePieces = await response.json();
       }
     }
   `)
@@ -154,6 +149,17 @@ let updateGameBoard = (event, whiteToPlay, findOffset, row, col) => {
   Js.log(boundingBox)
   whiteToPlay := !whiteToPlay.contents
 }
+
+%%raw(`{
+    async function startGame(apiUrl) {
+      const response = await fetch(apiUrl, {
+        method: "GET", 
+        cache: "no-cache",
+      });
+      const begin = await response.json();
+    };
+    startGame("http://localhost:8080/start");
+}`)
 
 let makeGrid = (~rows, ~cols) => {
   let rowArray = Belt.List.makeBy(rows, i => i)
