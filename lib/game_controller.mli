@@ -21,4 +21,6 @@ module Game_controller : sig
   val run_console : t -> unit
   val run_two_player : t -> string -> t
 
+  val play_ai : t -> ai: (Board.t -> Go_players.t -> int -> int -> t) -> t
+  val run_player_v_ai : t -> ai: (Board.t -> Go_players.t -> int -> int -> t) -> unit
 end

@@ -158,6 +158,48 @@ module Game_controller = struct
         | _ ->
           ({ bd; player; black_slots; white_slots }))
 
+
+    let play_ai ({ bd; player; black_slots; white_slots } : t) ~ai : t =
+      ai bd player black_slots white_slots
+
+    let run_player_v_ai ({ bd; player; black_slots; white_slots } : t) ~ai : unit =
+      let rec run ({ bd; player; black_slots; white_slots } : t) : unit = 
+        if check_done player black_slots white_slots then game_done bd 0 0
+        else (
+          Board.print_board bd;
+          Printf.printf
+            "Player %s, enter the row and column (e.g. '2 2')\n\
+              to place your piece (ctrl-d to quit): "
+            (Go_players.to_string player);
+          Out_channel.(flush stdout);
+          match In_channel.(input_line stdin) with
+          | None -> game_done bd 0 0
+          | Some input -> (
+              match String.split_on_chars input ~on:[ ' ' ] with
+              | [ s1; s2 ] -> (
+                  match (int_of_string_opt s1, int_of_string_opt s2) with
+                  | Some row, Some col ->
+                    let coord = (row - 1, col - 1) in
+                    if check_coords bd coord then
+                      let new_board = Board.update_board bd coord player in
+                      let occupied_board, pieces = take_pieces player new_board in
+                      if check_move occupied_board player coord then
+                        let new_board = update_game occupied_board player black_slots white_slots pieces in
+                        run
+                          (play_ai new_board ~ai)
+                      else (
+                        print_string "The position will make your piece(s) dead\n";
+                        run { bd; player; black_slots; white_slots })
+                    else run{ bd; player; black_slots; white_slots } 
+                  | _ ->
+                    print_string "Invalid input.\n";
+                    run { bd; player; black_slots; white_slots } )
+              | _ ->
+                print_string
+                  "Invalid input format. Please enter coordinates as 'row col'.\n";
+                run { bd; player; black_slots; white_slots }))
+      in
+      run (play_ai { bd; player; black_slots; white_slots } ~ai)
   let rec run_console { bd; player; black_slots; white_slots } =
     if check_done player black_slots white_slots then game_done bd 0 0
     else (
