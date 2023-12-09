@@ -47,7 +47,6 @@
 // let requestTest = makeRequest(apiUrl)
 
 // Js.log(requestTest)
-
 let findOffset = (x, y, left, right, top, bottom, squareSize) => {
   if (
     x >= left - 1 &&
@@ -90,19 +89,16 @@ let updateGameBoard = (event, whiteToPlay, findOffset, row, col) => {
     function(event, tempWhiteToPlay, mouseX, mouseY, squareSize, findOffset, row, col) {
       let true_row = Math.abs(mouseY - event.target.getBoundingClientRect().top) < Math.abs(mouseY - event.target.getBoundingClientRect().bottom) ? row : row+1;
       let true_col = Math.abs(mouseX - event.target.getBoundingClientRect().left) < Math.abs(mouseX - event.target.getBoundingClientRect().right) ? col : col+1;
-      console.log(true_row);
-      console.log(true_col);
-
-
-      let move = "http://localhost:8080/move";
-      let to_remove = makeMove(move);
+      // console.log(true_row);
+      // console.log(true_col);
 
       function createPiece() {
         var target = event.target;
         var offset = findOffset(mouseX, mouseY, target.getBoundingClientRect().left, target.getBoundingClientRect().right, target.getBoundingClientRect().top, target.getBoundingClientRect().bottom, squareSize);
         var newDiv = document.createElement("div");
         // Apply styles to pieces
-        newDiv.setAttribute("data-coordinates", offset.join(","));
+        newDiv.setAttribute("data-coordinates", true_row + " " + true_col);
+        console.log(true_row + " " + true_col);
         newDiv.style.position = "absolute";
         newDiv.style.width = "20px";
         newDiv.style.height = "20px";
@@ -123,8 +119,11 @@ let updateGameBoard = (event, whiteToPlay, findOffset, row, col) => {
         return [target.getBoundingClientRect().left, target.getBoundingClientRect().right , target.getBoundingClientRect().bottom , target.getBoundingClientRect().top ];
       }
       createPiece();
+
+      let move = "http://localhost:8080/move";
+      makeMove(move);
       function removePiece(coordinates) {
-        var divToRemove = document.querySelector('[data-coordinates="' + coordinates.join(",") + '"]');
+        var divToRemove = document.querySelector('[data-coordinates="' + coordinates + '"]');
         if (divToRemove) {
           divToRemove.remove();
         }
@@ -138,6 +137,16 @@ let updateGameBoard = (event, whiteToPlay, findOffset, row, col) => {
         });
         const removePieces = await response.json();
         console.log(removePieces);
+
+        for (let i = 0; i < removePieces.length; i++) {
+          let pair = removePieces[i];
+
+          let firstElem = pair[0];
+          let secondElem = pair[1];
+          let to_remove = firstElem + " " + secondElem;
+          console.log(to_remove);
+          removePiece(to_remove);
+        }
       }
     }
   `)

@@ -26,5 +26,7 @@ module Game_controller : sig
   val run_console : t  -> ai: (Board.t -> Go_players.t -> int -> int -> t) -> bool -> unit
   val run_two_player_console : t -> unit
   val run_player_vs_ai_console : t -> ai: (Board.t -> Go_players.t -> int -> int -> t) -> unit
+  val conv_string_to_pair_list : string -> (int * int) list
+  val get_white_slots : t -> int
 end
 

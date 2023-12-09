@@ -28,8 +28,14 @@ let move_handler req =
     "Access-Control-Allow-Headers", "Content-Type";
   ] in
   let removed_pieces = Game_controller.get_dead_pieces (game_state.game) move in 
+  let old_state = game_state.game in
   game_state.game <- (Game_controller.run_two_player game_state.game move);
-  Dream.json ~headers (Yojson.Safe.to_string (data_list_to_yojson removed_pieces))
+  let remove = 
+    (match Game_controller.get_white_slots game_state.game = 1 with 
+      | true -> game_state.game <- old_state; (Game_controller.conv_string_to_pair_list move)
+      | false -> removed_pieces) in 
+     
+  Dream.json ~headers (Yojson.Safe.to_string (data_list_to_yojson remove))
 
   (* (Printf.sprintf "Received POST request with body: %s" body) *)
 

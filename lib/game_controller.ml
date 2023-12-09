@@ -39,6 +39,11 @@ module Game_controller = struct
   let check_done (player : Go_players.t) (black_slots : int) (white_slots : int)
     : bool =
     if Go_players.is_white player then white_slots <= 0 else black_slots <= 0
+  
+  let conv_string_to_pair_list move = 
+    match String.split move ~on:' ' with 
+      | [row; col] -> [((int_of_string row) - 1, (int_of_string col) - 1)]
+      | _ -> failwith "Incorrect input"
 
   let update_game (bd : Board.t) (player : Go_players.t) (black_slots : int)
       (white_slots : int) (pieces : int) : t =
@@ -65,7 +70,7 @@ module Game_controller = struct
         white_slots = white_slots + pieces - 2;
       }
 
-  let check_coords (board : Board.t) (coord : int * int) : bool =
+  let check_coords (board : Board.t) (coord : int * int) : bool = 
     if not (Board.valid_coordinate board coord) then (
       print_string "Invalid coordinitate.\n";
       false)
@@ -105,6 +110,8 @@ module Game_controller = struct
   let check_move (bd : Board.t) (player : Go_players.t) (coord : int * int) :
     bool =
     is_alive bd (Go_players.opposite player) coord
+
+  let get_white_slots ({ white_slots; _}) = white_slots
 
   let take_pieces (player : Go_players.t) (bd : Board.t) : Board.t * int =
     let coords = Board.get_board bd in
@@ -158,12 +165,12 @@ module Game_controller = struct
                     Board.print_board ai_play.bd; ai_play)
                   else 
                     (Board.print_board updated.bd; updated)
-                else ({ bd; player; black_slots; white_slots })
-              else ({ bd; player; black_slots; white_slots }) 
+                else (init_game (1) Go_players.black)
+              else (init_game (1) Go_players.black) 
             | _ ->
-              ({ bd; player; black_slots; white_slots }))
+              (init_game (1) Go_players.black))
         | _ ->
-          ({ bd; player; black_slots; white_slots }))
+          (init_game (1) Go_players.black))
 
   let run_two_player ({ bd; player; black_slots; white_slots } : t) (inputs : string) : t = 
     run { bd; player; black_slots; white_slots } ~ai:(fun _ _ _ _ -> { bd; player; black_slots; white_slots }) false inputs
