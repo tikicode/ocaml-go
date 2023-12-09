@@ -22,30 +22,38 @@ let rec random_player (bd : Board.t) (player : Go_players.t) (black_slots : int)
 
 (* module MCTS = struct 
   type t = {
-    move: int * int option
-    mutable visits: int
-    mutable wins: int
-    mutable children = t list
+    bd : Board.t;
+    player : Go_players.t;
+    black_slots : int;
+    white_slots : int;
+    move: int * int;
+    mutable visits: int;
+    mutable wins: int;
+    mutable children: t list;
   }
-  let random_move moves =
-    List.nth moves (Random.int (List.length moves))
+  let rec random_move (bd : Board.t) (player : Go_players.t) (black_slots : int) (white_slots : int) : int * int =
+    let next_move = Random.int bd_size, Random.int bd_size in
+    let p = Board.get_player bd next_move in
+    if Go_players.is_blank p then
+      let new_board = Board.update_board bd next_move player in
+      let occupied_board, _ = Game_controller.take_pieces player new_board in
+      if Game_controller.check_move occupied_board player next_move then
+        next_move
+      else 
+        random_move bd player black_slots white_slots 
+    else random_move bd player black_slots white_slots
 
-  let rec expand_node state node =
-    let untried_moves = legal_moves state in
-    match untried_moves with
-    | [] -> ()
-    | _ ->
-      let move = random_move untried_moves in
-      let child_state = { board = copy_board state.board; player_turn = state.player_turn } in
-      make_move child_state move;
-      let child_node = { move = Some move; visits = 0; wins = 0; children = [] } in
-      node.children <- child_node :: node.children;
-      simulate state child_state;
-      backpropagate node (result state child_state)
+  let rec expand_node cur_game node =
+    let move = random_move untried_moves in
+    make_move child_state move; 
+    let child_node = { move; visits = 0; wins = 0; children = [] } in
+    node.children <- child_node :: node.children;
+    simulate state child_state;
+    backpropagate node (result state child_state)
 
-  and simulate initial_state state =
+  and simulate initial_state state = (* pseudo for game state*)
     let rec simulate_until_end state =
-      let legal_moves = legal_moves state in
+      let legal_moves = legal_moves state in (* pseudo for checking legal move, may create func *)
       match legal_moves with
       | [] -> result initial_state state
       | _ ->
@@ -58,15 +66,13 @@ let rec random_player (bd : Board.t) (player : Go_players.t) (black_slots : int)
   and backpropagate node result =
     node.visits <- node.visits + 1;
     node.wins <- node.wins + result;
-    match node.move with
-    | None -> ()
-    | Some _ -> backpropagate (List.hd node.children) result
+    backpropagate (List.hd node.children) result
 
   and result initial_state state =
-    let size = Array.length initial_state.board in
+    let size = Array.length initial_state.board in (* array for mutability *)
     let score =
       if has_winner state then
-        if state.player_turn = Black then
+        if state.player = Black then
           1
         else
           -1
@@ -75,7 +81,7 @@ let rec random_player (bd : Board.t) (player : Go_players.t) (black_slots : int)
       else
         simulate initial_state state
     in
-    if state.player_turn = Black then
+    if state.player = Black then
       score
     else
       -score
@@ -89,7 +95,7 @@ let rec random_player (bd : Board.t) (player : Go_players.t) (black_slots : int)
     false
 
   let mcts state iterations =
-    let root = { move = None; visits = 0; wins = 0; children = [] } in
+    let root = { move = None; visits = 0; wins = 0; children = [] } in (* make move optional ? *)
     for _ = 1 to iterations do
       let node = select_node state root in
       expand_node state node;
@@ -100,12 +106,12 @@ let rec random_player (bd : Board.t) (player : Go_players.t) (black_slots : int)
   and select_node state node =
     if node.children = [] then
       node
-    else if Random.float 1.0 < 0.7 then
+    else if Random.float 1.0 < 0.7 then (* selection criterion *)
       select_node state (List.hd node.children)
     else
       select_node state (uct_best_child node)
 
-  and uct_best_child node =
+  and uct_best_child node = 
     let log_total_visits = log (float_of_int node.visits) in
     let uct_value child =
       let exploitation_term = float_of_int child.wins /. float_of_int child.visits in
@@ -120,7 +126,7 @@ let rec random_player (bd : Board.t) (player : Go_players.t) (black_slots : int)
     | None -> failwith "No valid moves found"
     | Some child -> child
 
-  let play_game size iterations =
+  let train size iterations = (* very rudimentary training code *) 
     let initial_state = { board = create_board size; player_turn = Black } in
     let best_move = mcts initial_state iterations in
     Printf.printf "Best Move: (%d, %d)\n" (fst best_move + 1) (snd best_move + 1)
