@@ -64,6 +64,8 @@ module Board = struct
     in
     aux 0 0 []
 
+  let get_size (bd : t) : int = bd.size
+
   let count (bd : t) ~f : int =
     let count_row (row : Go_players.t list) =
       List.fold row ~init:0 ~f:(fun acc p -> if f p then acc + 1 else acc)

@@ -1,6 +1,6 @@
 (library
  (name go)
- (modules players board game_controller)
+ (modules players board game_controller game_ai)
  (libraries core))
 
 ;(env

@@ -11,5 +11,6 @@ module Board : sig
   val get_player : t -> int * int -> Go_players.t
   val update_board : t -> int * int -> Go_players.t -> t
   val get_board : t -> (int * int) list
+  val get_size : t -> int
   val count : t -> f:(Go_players.t -> bool) -> int
 end
