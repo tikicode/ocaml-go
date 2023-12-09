@@ -7,6 +7,8 @@ module Game_controller : sig
   val get_dead_pieces : t -> string -> (int * int) list
   val init_game : int -> Go_players.t -> t
   val game_done : Board.t -> int -> int -> unit
+  val game_done_black_score : Board.t -> int
+  val game_done_white_score : Board.t -> int
   val check_done : Go_players.t -> int -> int -> bool
   val update_game : Board.t -> Go_players.t -> int -> int -> int -> t
   val check_coords : Board.t -> int * int -> bool
@@ -23,9 +25,9 @@ module Game_controller : sig
   val run_two_player : t -> string -> t
   val run_player_vs_ai : t -> ai: (Board.t -> Go_players.t -> int -> int -> t) -> string -> t
 
-  val run_console : t  -> ai: (Board.t -> Go_players.t -> int -> int -> t) -> bool -> unit
-  val run_two_player_console : t -> unit
-  val run_player_vs_ai_console : t -> ai: (Board.t -> Go_players.t -> int -> int -> t) -> unit
+  val run_console : t -> unit
+  (* val run_two_player_console : t -> unit *)
+  (* val run_player_vs_ai_console : t -> ai: (Board.t -> Go_players.t -> int -> int -> t) -> unit *)
   val conv_string_to_pair_list : string -> (int * int) list
   val get_white_slots : t -> int
 end

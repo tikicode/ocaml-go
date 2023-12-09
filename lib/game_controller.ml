@@ -36,14 +36,20 @@ module Game_controller = struct
     else
       Printf.printf "It's a tie!\n"
 
+  let game_done_white_score (bd : Board.t): int = 
+    Board.count bd ~f:(Go_players.is_consistent Go_players.white) + 6
+
+  let game_done_black_score (bd : Board.t): int = 
+    Board.count bd ~f:(Go_players.is_consistent Go_players.black)
+
   let check_done (player : Go_players.t) (black_slots : int) (white_slots : int)
     : bool =
     if Go_players.is_white player then white_slots <= 0 else black_slots <= 0
-  
+
   let conv_string_to_pair_list move = 
     match String.split move ~on:' ' with 
-      | [row; col] -> [((int_of_string row) - 1, (int_of_string col) - 1)]
-      | _ -> failwith "Incorrect input"
+    | [row; col] -> [((int_of_string row) - 1, (int_of_string col) - 1)]
+    | _ -> failwith "Incorrect input"
 
   let update_game (bd : Board.t) (player : Go_players.t) (black_slots : int)
       (white_slots : int) (pieces : int) : t =
@@ -135,18 +141,18 @@ module Game_controller = struct
   let get_dead_pieces { bd; player;_ } (inputs : string) : (int * int) list =
     match (String.split_on_chars inputs ~on:[ ' ' ]) with
     | [s1; s2 ] -> 
-        (match (int_of_string_opt s1, int_of_string_opt s2) with
-        | Some row, Some col ->
-          let coord = (row-1, col-1) in
-          if check_coords bd coord then (
-            let new_board =
-               Board.update_board bd coord player in
-              return_dead player new_board
-          )
-            else [(21,21)]
-        | _ -> [(22,22)])
+      (match (int_of_string_opt s1, int_of_string_opt s2) with
+       | Some row, Some col ->
+         let coord = (row-1, col-1) in
+         if check_coords bd coord then (
+           let new_board =
+             Board.update_board bd coord player in
+           return_dead player new_board
+         )
+         else [(21,21)]
+       | _ -> [(22,22)])
     | _ -> [(23,23)]
-      
+
   let run ({ bd; player; black_slots; white_slots } : t) ~ai (uses_ai : bool) (inputs : string) : t =
     match inputs with
     | input -> (
@@ -174,14 +180,14 @@ module Game_controller = struct
 
   let run_two_player ({ bd; player; black_slots; white_slots } : t) (inputs : string) : t = 
     run { bd; player; black_slots; white_slots } ~ai:(fun _ _ _ _ -> { bd; player; black_slots; white_slots }) false inputs
-  
+
   let run_player_vs_ai ({ bd; player; black_slots; white_slots } : t) ~ai (inputs : string) : t =
     run (play_ai ({ bd; player; black_slots; white_slots }) ~ai) ~ai true inputs
-          
 
-  let rec run_console ({ bd; player; black_slots; white_slots } : t) ~ai (uses_ai : bool): unit =
-    if check_done player black_slots white_slots then game_done bd 0 0
-    else (
+
+  (* let rec run_console ({ bd; player; black_slots; white_slots } : t) ~ai (uses_ai : bool): unit =
+     if check_done player black_slots white_slots then game_done bd 0 0
+     else (
       Board.print_board bd;
       Printf.printf
         "Player %s, enter the row and column (e.g. '2 2')\n\
@@ -216,10 +222,49 @@ module Game_controller = struct
               "Invalid input format. Please enter coordinates as 'row col'.\n";
               run_console { bd; player; black_slots; white_slots } ~ai uses_ai))
 
-  let run_two_player_console ({ bd; player; black_slots; white_slots } : t) : unit =
-    run_console { bd; player; black_slots; white_slots } ~ai:(fun _ _ _ _ -> { bd; player; black_slots; white_slots }) false
+     let run_two_player_console ({ bd; player; black_slots; white_slots } : t) : unit =
+     run_console { bd; player; black_slots; white_slots } ~ai:(fun _ _ _ _ -> { bd; player; black_slots; white_slots }) false
 
-  let run_player_vs_ai_console ({ bd; player; black_slots; white_slots } : t) ~ai : unit =
-    run_console (play_ai { bd; player; black_slots; white_slots } ~ai) ~ai true
-    
+     let run_player_vs_ai_console ({ bd; player; black_slots; white_slots } : t) ~ai : unit =
+     run_console (play_ai { bd; player; black_slots; white_slots } ~ai) ~ai true *)
+
+  let rec run_console { bd; player; black_slots; white_slots } =
+    if check_done player black_slots white_slots then game_done bd 0 0
+    else (
+      Board.print_board bd;
+      Printf.printf
+        "Player %s, enter the row and column (e.g. '2 2')\n\
+         to place your piece (ctrl-d to quit): "
+        (Go_players.to_string player);
+      Out_channel.(flush stdout);
+      match In_channel.(input_line stdin) with
+      | None -> game_done bd 0 0
+      | Some input -> (
+          match String.split_on_chars input ~on:[ ' ' ] with
+          | [ s1; s2 ] -> (
+              match (int_of_string_opt s1, int_of_string_opt s2) with
+              | Some row, Some col ->
+                let coord = (row - 1, col - 1) in
+                if check_coords bd coord then
+                  let new_board = Board.update_board bd coord player in
+                  Board.print_board new_board;
+                  let occupied_board, pieces = take_pieces player new_board in
+                  if check_move occupied_board player coord then
+                    run_console
+                      (update_game occupied_board player black_slots
+                         white_slots pieces)
+                  else (
+                    print_string "The position will make your piece(s) dead\n";
+                    run_console { bd; player; black_slots; white_slots })
+                else run_console { bd; player; black_slots; white_slots }
+              | _ ->
+                print_string "Invalid input.\n";
+                run_console { bd; player; black_slots; white_slots })
+          | _ ->
+            print_string
+              "Invalid input format. Please enter coordinates as 'row col'.\n";
+            run_console { bd; player; black_slots; white_slots }))
+
+
+
 end
