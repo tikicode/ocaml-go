@@ -89,45 +89,53 @@ let updateGameBoard = (event, findOffset, row, col) => {
     function(event, mouseX, mouseY, squareSize, findOffset, row, col) {
       let true_row = Math.abs(mouseY - event.target.getBoundingClientRect().top) < Math.abs(mouseY - event.target.getBoundingClientRect().bottom) ? row : row+1;
       let true_col = Math.abs(mouseX - event.target.getBoundingClientRect().left) < Math.abs(mouseX - event.target.getBoundingClientRect().right) ? col : col+1;
+      var coordinates = true_row + " " + true_col;
 
       function createPiece(toPlay) {
         var target = event.target;
         var offset = findOffset(mouseX, mouseY, target.getBoundingClientRect().left, target.getBoundingClientRect().right, target.getBoundingClientRect().top, target.getBoundingClientRect().bottom, squareSize);
-        var newDiv = document.createElement("div");
-        // Apply styles to pieces
-        newDiv.setAttribute("data-coordinates", true_row + " " + true_col);
-        console.log(true_row + " " + true_col);
-        newDiv.style.position = "absolute";
-        newDiv.style.width = "20px";
-        newDiv.style.height = "20px";
-        newDiv.style.borderRadius = "50%";
-        newDiv.style.overflow = "hidden";
-        newDiv.style.left = target.getBoundingClientRect().left + offset[0] + "px";
-        newDiv.style.top = target.getBoundingClientRect().top + offset[1] + "px";
-        newDiv.style.background = toPlay;
+        var divAlreadyExists = document.querySelector('[data-coordinates="' + coordinates + '"]');
+        // if (!divAlreadyExists) {
+          var newDiv = document.createElement("div");
+          // Apply styles to pieces
+          newDiv.setAttribute("data-coordinates", coordinates);
+          console.log(true_row + " " + true_col);
+          newDiv.style.position = "absolute";
+          newDiv.style.width = "20px";
+          newDiv.style.height = "20px";
+          newDiv.style.borderRadius = "50%";
+          newDiv.style.overflow = "hidden";
+          newDiv.style.left = target.getBoundingClientRect().left + offset[0] + "px";
+          newDiv.style.top = target.getBoundingClientRect().top + offset[1] + "px";
+          newDiv.style.background = toPlay;
 
-        // Append the div to the document body
-        document.body.appendChild(newDiv);
+          // Append the div to the document body
+          document.body.appendChild(newDiv);
+        // }
+        
 
         return [target.getBoundingClientRect().left, target.getBoundingClientRect().right , target.getBoundingClientRect().bottom , target.getBoundingClientRect().top ];
       }
 
-      let turnEndpoint = "http://localhost:8080/player_turn";
-      getTurn(turnEndpoint)
-      .then(_ => {
-          let moveEndpoint = "http://localhost:8080/move";
-          return makeMove(moveEndpoint);
-        });
+      var alreadyExists = document.querySelector('[data-coordinates="' + coordinates + '"]');
+      if(!alreadyExists) {
+        let turnEndpoint = "http://localhost:8080/player_turn";
+        getTurn(turnEndpoint)
+        .then(_ => {
+            let moveEndpoint = "http://localhost:8080/move";
+            return makeMove(moveEndpoint);
+          });
+      }
 
       function removePiece(coordinates) {
         var divToRemove = document.querySelector('[data-coordinates="' + coordinates + '"]');
         if (divToRemove) {
           divToRemove.remove();
         }
-        divToRemove = document.querySelector('[data-coordinates="' + coordinates + '"]');
-        if (divToRemove) {
-          divToRemove.remove();
-        }
+        // divToRemove = document.querySelector('[data-coordinates="' + coordinates + '"]');
+        // if (divToRemove) {
+        //   divToRemove.remove();
+        // }
       }
       async function makeMove(moveEndpoint) {
         console.log("Made Move");
@@ -145,7 +153,10 @@ let updateGameBoard = (event, findOffset, row, col) => {
           let secondElem = pair[1];
           let to_remove = firstElem + " " + secondElem;
           console.log(to_remove);
-          removePiece(to_remove);
+          console.log(coordinates);
+          // var alreadyExists = document.querySelectorAll('[data-coordinates="' + coordinates + '"]');
+          // if ((alreadyExists.length < 1)) {
+            removePiece(to_remove);
         }
       }
 

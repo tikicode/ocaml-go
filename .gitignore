@@ -28,6 +28,4 @@ setup.log
 # Local OPAM switch
 _opam/
 
-*.node_modules
-
 lib/go-frontend/node_modules

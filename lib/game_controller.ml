@@ -39,11 +39,9 @@ module Game_controller = struct
 
   let game_done_black_score (bd : Board.t) : int =
     Board.count bd ~f:(Go_players.is_consistent Go_players.black)
-  
-  let return_board ({ bd; _ }) : Board.t = bd
 
-  let return_player ({player; _}) : string =
-    Go_players.to_string player
+  let return_board { bd; _ } : Board.t = bd
+  let return_player { player; _ } : string = Go_players.to_string player
 
   let check_done (player : Go_players.t) (black_slots : int) (white_slots : int)
       : bool =
