@@ -1,0 +1,43 @@
+rescript = 1
+g_finger := /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/@rescript/react/lib/ocaml/install.stamp
+g_finger := /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/@rescript/core/lib/ocaml/install.stamp
+g_finger := /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/rescript-webapi/lib/ocaml/install.stamp
+g_finger := /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/rescript-vitest/lib/ocaml/install.stamp
+rule astj
+  command = /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/rescript/darwin/bsc.exe  -bs-v 10.1.4 -bs-jsx 4 -bs-jsx-mode automatic -open RescriptCore -absname -bs-ast -o $out $i
+o tests/App_test.ast : astj ../../tests/App_test.res
+rule deps_dev
+  command = /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/rescript/darwin/bsb_helper.exe -g -hash 39a830e77bc63c0260e7be642c050d0a $in
+  restat = 1
+o tests/App_test.d : deps_dev tests/App_test.ast
+rule mij_dev
+  command = /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/rescript/darwin/bsc.exe -I tests -I src -I /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/@rescript/react/lib/ocaml -I /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/@rescript/core/lib/ocaml -I /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/rescript-webapi/lib/ocaml -I /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/rescript-vitest/lib/ocaml -open RescriptCore  -bs-package-name vite-react-rescript-starter -bs-package-output es6:$in_d:.bs.js -bs-v $g_finger $i
+  dyndep = 1
+  restat = 1
+o tests/App_test.cmj tests/App_test.cmi ../../tests/App_test.bs.js : mij_dev tests/App_test.ast
+o tests/Bindings.ast : astj ../../tests/Bindings.res
+o tests/Bindings.d : deps_dev tests/Bindings.ast
+o tests/Bindings.cmj tests/Bindings.cmi ../../tests/Bindings.bs.js : mij_dev tests/Bindings.ast
+o src/App.ast : astj ../../src/App.res
+rule deps
+  command = /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/rescript/darwin/bsb_helper.exe -hash 39a830e77bc63c0260e7be642c050d0a $in
+  restat = 1
+o src/App.d : deps src/App.ast src/App.iast
+o src/App.iast : astj ../../src/App.resi
+rule mi
+  command = /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/rescript/darwin/bsc.exe -I src -I /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/@rescript/react/lib/ocaml -I /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/@rescript/core/lib/ocaml -I /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/rescript-webapi/lib/ocaml -open RescriptCore  -bs-v $g_finger $i
+  dyndep = 1
+  restat = 1
+o src/App.cmi : mi src/App.iast
+rule mj
+  command = /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/rescript/darwin/bsc.exe -bs-read-cmi -I src -I /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/@rescript/react/lib/ocaml -I /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/@rescript/core/lib/ocaml -I /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/rescript-webapi/lib/ocaml -open RescriptCore  -bs-package-name vite-react-rescript-starter -bs-package-output es6:$in_d:.bs.js -bs-v $g_finger $i
+  dyndep = 1
+  restat = 1
+o src/App.cmj ../../src/App.bs.js : mj src/App.ast src/App.cmi
+o src/Main.ast : astj ../../src/Main.res
+o src/Main.d : deps src/Main.ast
+rule mij
+  command = /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/rescript/darwin/bsc.exe -I src -I /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/@rescript/react/lib/ocaml -I /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/@rescript/core/lib/ocaml -I /Users/johndaviddelucia/Desktop/Go_OCaml/ocaml-go/lib/go-frontend/node_modules/rescript-webapi/lib/ocaml -open RescriptCore  -bs-package-name vite-react-rescript-starter -bs-package-output es6:$in_d:.bs.js -bs-v $g_finger $i
+  dyndep = 1
+  restat = 1
+o src/Main.cmj src/Main.cmi ../../src/Main.bs.js : mij src/Main.ast

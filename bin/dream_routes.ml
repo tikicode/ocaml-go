@@ -10,6 +10,8 @@ type data = (int*int)
 
 type data_list = data list [@@deriving yojson]
 
+type turn = string [@@deriving yojson]
+
 (* let test_data_list : data_list = [(1, 2); (2,3); (1,5)] *)
 
 type game_state = {
@@ -34,10 +36,17 @@ let move_handler req =
     (match Game_controller.get_white_slots game_state.game = 1 with 
       | true -> game_state.game <- old_state; (Game_controller.conv_string_to_pair_list move)
       | false -> removed_pieces) in 
-     
   Dream.json ~headers (Yojson.Safe.to_string (data_list_to_yojson remove))
 
   (* (Printf.sprintf "Received POST request with body: %s" body) *)
+
+let turn_handler _ = 
+  let headers = [
+    "Access-Control-Allow-Origin", "*";
+    "Access-Control-Allow-Methods", "GET, POST, OPTIONS";
+    "Access-Control-Allow-Headers", "Content-Type";
+  ] in
+  Dream.json ~headers (Yojson.Safe.to_string (turn_to_yojson (Game_controller.return_player game_state.game)))
 
 
 let () =
@@ -46,5 +55,7 @@ let () =
   @@ Dream.router [
     
     Dream.post "/move" move_handler;
+
+    Dream.get "/player_turn" turn_handler;
 
   ]

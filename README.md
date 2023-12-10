@@ -2,6 +2,8 @@
 
 ### Rules
 
+1. Maintain player color on illegal move (add a get color of player to backend)
+2. Implement count and score endpoint 
 The following rules are either copied or adapted from "The Rules and Elements of Go" by James Davies.
 
 - The board is empty at the onset of the game (unless players agree to place a handicap).
