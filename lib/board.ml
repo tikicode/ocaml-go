@@ -10,8 +10,7 @@ module Board = struct
     in
     { board; size }
 
-  let return_list (bd : t) : Go_players.t list list = 
-    bd.board
+  let return_list (bd : t) : Go_players.t list list = bd.board
 
   let print_board (bd : t) : unit =
     let rec print_rows (board : Go_players.t list list) (n : int) : unit =
@@ -52,7 +51,6 @@ module Board = struct
     let cols_after = List.tl_exn cols_cur_after in
     let new_row = cols_before @ (p :: cols_after) in
     { board = rows_before @ (new_row :: rows_after); size }
-
 
   let get_board (bd : t) : (int * int) list =
     let rec aux (x : int) (y : int) (coords : (int * int) list) :
