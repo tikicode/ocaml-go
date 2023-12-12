@@ -47,6 +47,7 @@
 // let requestTest = makeRequest(apiUrl)
 
 // Js.log(requestTest)
+
 let findOffset = (x, y, left, right, top, bottom, squareSize) => {
   if (
     x >= left - 1 &&
@@ -90,40 +91,69 @@ let updateGameBoard = (event, findOffset, row, col) => {
       let true_row = Math.abs(mouseY - event.target.getBoundingClientRect().top) < Math.abs(mouseY - event.target.getBoundingClientRect().bottom) ? row : row+1;
       let true_col = Math.abs(mouseX - event.target.getBoundingClientRect().left) < Math.abs(mouseX - event.target.getBoundingClientRect().right) ? col : col+1;
       var coordinates = true_row + " " + true_col;
+      let moveEndpoint = "http://localhost:8080/move";
+      let aiMoveEndpoint = "http://localhost:8080/move_ai";
 
       function createPiece(toPlay) {
         var target = event.target;
         var offset = findOffset(mouseX, mouseY, target.getBoundingClientRect().left, target.getBoundingClientRect().right, target.getBoundingClientRect().top, target.getBoundingClientRect().bottom, squareSize);
         var divAlreadyExists = document.querySelector('[data-coordinates="' + coordinates + '"]');
-          var newDiv = document.createElement("div");
-          // Apply styles to pieces
-          newDiv.setAttribute("data-coordinates", coordinates);
-          console.log(true_row + " " + true_col);
-          newDiv.style.position = "absolute";
-          newDiv.style.width = "20px";
-          newDiv.style.height = "20px";
-          newDiv.style.borderRadius = "50%";
-          newDiv.style.overflow = "hidden";
-          newDiv.style.left = target.getBoundingClientRect().left + offset[0] + "px";
-          newDiv.style.top = target.getBoundingClientRect().top + offset[1] + "px";
-          newDiv.style.background = toPlay;
+        var newDiv = document.createElement("div");
+        // Apply styles to pieces
+        newDiv.setAttribute("data-coordinates", coordinates);
+        console.log(true_row + " " + true_col);
+        newDiv.style.position = "absolute";
+        newDiv.style.width = "20px";
+        newDiv.style.height = "20px";
+        newDiv.style.borderRadius = "50%";
+        newDiv.style.overflow = "hidden";
+        newDiv.style.left = target.getBoundingClientRect().left + offset[0] + "px";
+        newDiv.style.top = target.getBoundingClientRect().top + offset[1] + "px";
+        newDiv.style.background = toPlay;
 
-          // Append the div to the document body
-          document.body.appendChild(newDiv);
-        
-
-        return [target.getBoundingClientRect().left, target.getBoundingClientRect().right , target.getBoundingClientRect().bottom , target.getBoundingClientRect().top ];
+        // Append the div to the document body
+        document.body.appendChild(newDiv);
       }
 
+      function createPieceAI(row, col) {
+        let board_size = 500;
+
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        let offset_row = ((screenWidth - board_size) / 2) + (col * squareSize) - 9;
+        let offset_col = ((screenHeight - board_size) / 2) + (row * squareSize) + (2 * squareSize)- 9;
+
+        var coordinates = row + " " + col;
+        var divAlreadyExists = document.querySelector('[data-coordinates="' + coordinates + '"]');
+        var newDiv = document.createElement("div");
+        // Apply styles to pieces
+        newDiv.setAttribute("data-coordinates", coordinates);
+        console.log("AI COORDINATES: " + coordinates);
+        newDiv.style.position = "absolute";
+        newDiv.style.width = "20px";
+        newDiv.style.height = "20px";
+        newDiv.style.borderRadius = "50%";
+        newDiv.style.overflow = "hidden";
+        newDiv.style.left = offset_row + "px";
+        newDiv.style.top = offset_col + "px";
+        newDiv.style.background = "white";
+
+        // Append the div to the document body
+        document.body.appendChild(newDiv);
+      }
+
+
       var alreadyExists = document.querySelector('[data-coordinates="' + coordinates + '"]');
+      
       if(!alreadyExists) {
         let turnEndpoint = "http://localhost:8080/player_turn";
         getTurn(turnEndpoint)
-        .then(_ => {
-            let moveEndpoint = "http://localhost:8080/move";
-            return makeMove(moveEndpoint);
+        .then(turn => {
+            makeMove(moveEndpoint, true_row, true_col);
+            makeMoveAI(aiMoveEndpoint);
           });
       }
+      
 
       function removePiece(coordinates) {
         var divToRemove = document.querySelector('[data-coordinates="' + coordinates + '"]');
@@ -132,7 +162,7 @@ let updateGameBoard = (event, findOffset, row, col) => {
         }
       }
 
-      async function makeMove(moveEndpoint) {
+      async function makeMove(moveEndpoint, true_row, true_col) {
         console.log("Made Move");
         const response = await fetch(moveEndpoint, {
           method: "POST", 
@@ -159,6 +189,7 @@ let updateGameBoard = (event, findOffset, row, col) => {
         const toPlay = await response.json();
         let playerTurn = (toPlay === "White") ? "white" : "black";
         createPiece(playerTurn);
+        return playerTurn;
       }
 
       async function resetGame(resetEndpoint) {
@@ -167,6 +198,19 @@ let updateGameBoard = (event, findOffset, row, col) => {
           cache: "no-cache",
         });
         const reset = await response.json();
+      }
+
+      async function makeMoveAI(aiEndpoint) {
+        const response = await fetch(aiEndpoint, {
+          method: "GET", 
+          cache: "no-cache",
+        });
+        const move = await response.json();
+        const movesArray = move.split(" ");
+        const true_row = parseInt(movesArray[0], 10);
+        const true_col = parseInt(movesArray[1], 10);
+        makeMove(moveEndpoint, true_row+1, true_col+1);
+        createPieceAI(true_row+1, true_col+1);
       }
     }
   `)

@@ -51,10 +51,10 @@ module Game_controller = struct
     : bool =
     if Go_players.is_white player then white_slots <= 0 else black_slots <= 0
 
-  let rec next_move { bd; player; black_slots; white_slots } : string =
+  let rec next_move_ai { bd; player; black_slots; white_slots } : string =
     let random_coordinate = (Random.int (Board.get_size bd), Random.int (Board.get_size bd)) in
     if not (Board.valid_coordinate bd random_coordinate) then
-      next_move { bd; player; black_slots; white_slots }
+      next_move_ai { bd; player; black_slots; white_slots }
     else
       match random_coordinate with 
       |(x,y) -> string_of_int x ^ " " ^ string_of_int y

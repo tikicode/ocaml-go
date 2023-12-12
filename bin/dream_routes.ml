@@ -35,6 +35,18 @@ let two_player_move_handler req =
   in
   Dream.json ~headers (Yojson.Safe.to_string (data_list_to_yojson remove))
 
+
+let ai_move_handler _ =
+  let headers =
+    [
+      ("Access-Control-Allow-Origin", "*");
+      ("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+      ("Access-Control-Allow-Headers", "Content-Type");
+    ]
+  in
+  let move = Game_controller.next_move_ai game_state.game in 
+  Dream.json ~headers (Yojson.Safe.to_string (turn_to_yojson move))
+
 let turn_handler _ =
   let headers =
     [
@@ -81,4 +93,6 @@ let () =
       Dream.get "/player_turn" turn_handler;
       Dream.get "/reset_game" reset_game_handler;
       Dream.get "/get_score" score_handler
+      Dream.get "/move_ai" ai_move_handler;
     ]
+
