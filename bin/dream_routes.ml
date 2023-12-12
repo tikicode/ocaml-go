@@ -29,8 +29,8 @@ let two_player_move_handler req =
   let remove =
     match Game_controller.get_white_slots game_state.game = 1 with
     | true ->
-        game_state.game <- old_state;
-        Game_controller.conv_string_to_pair_list move
+      game_state.game <- old_state;
+      Game_controller.conv_string_to_pair_list move
     | false -> removed_pieces
   in
   Dream.json ~headers (Yojson.Safe.to_string (data_list_to_yojson remove))
@@ -47,6 +47,21 @@ let turn_handler _ =
     (Yojson.Safe.to_string
        (turn_to_yojson (Game_controller.return_player game_state.game)))
 
+let score_handler _ =
+  let headers =
+    [
+      ("Access-Control-Allow-Origin", "*");
+      ("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+      ("Access-Control-Allow-Headers", "Content-Type");
+    ]
+  in
+  let final_board = Game_controller.return_board game_state.game in 
+  let white_score = Game_controller.game_done_white_score final_board in 
+  let black_score = Game_controller.game_done_black_score final_board in
+    Dream.json ~headers
+      (Yojson.Safe.to_string
+         (turn_to_yojson (Game_controller.game_decide_winner white_score black_score)))
+
 let reset_game_handler _ =
   let headers =
     [
@@ -61,8 +76,9 @@ let reset_game_handler _ =
 let () =
   Dream.run @@ Dream.logger
   @@ Dream.router
-       [
-         Dream.post "/move" two_player_move_handler;
-         Dream.get "/player_turn" turn_handler;
-         Dream.get "/reset_game" reset_game_handler;
-       ]
+    [
+      Dream.post "/move" two_player_move_handler;
+      Dream.get "/player_turn" turn_handler;
+      Dream.get "/reset_game" reset_game_handler;
+      Dream.get "/get_score" score_handler
+    ]

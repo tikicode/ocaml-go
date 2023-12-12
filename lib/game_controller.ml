@@ -39,6 +39,10 @@ module Game_controller = struct
 
   let game_done_black_score (bd : Board.t) : int =
     Board.count bd ~f:(Go_players.is_consistent Go_players.black)
+  
+  let game_decide_winner (white_score : int) (black_score : int) : string = 
+    if white_score > black_score then "white wins with " ^ (string_of_int white_score)
+    else "black wins with " ^ (string_of_int black_score)
 
   let return_board { bd; _ } : Board.t = bd
   let return_player { player; _ } : string = Go_players.to_string player
