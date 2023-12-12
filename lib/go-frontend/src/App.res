@@ -191,7 +191,15 @@ let updateGameBoard = (event, findOffset, row, col) => {
         createPiece(playerTurn);
         return playerTurn;
       }
-
+      
+      async function getScore(scoreEndpoint) {
+        const response = await fetch(turnEndpoint, {
+          method: "GET", 
+          cache: "no-cache",
+        });
+        const score = await response.json();
+      }
+      
       async function resetGame(resetEndpoint) {
         const response = await fetch(turnEndpoint, {
           method: "GET", 
@@ -244,6 +252,15 @@ let makeGrid = (~rows, ~cols) => {
       } catch (error) {
           console.error("Error resetting the game:", error);
       }
+  });
+
+  var button = document.getElementById('score-button');
+
+  // Add a click event listener to the button
+  button.addEventListener('click', function() {
+    let turnEndpoint = "http://localhost:8080/player_turn";
+    getScore(turnEndpoint)
+    // You can perform any other actions or functions here
   });
 `)
 
