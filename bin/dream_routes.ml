@@ -9,7 +9,6 @@ open Game_controller
 type data = int * int [@@deriving yojson]
 type data_list = data list [@@deriving yojson]
 type turn = string [@@deriving yojson]
-
 type game_state = { mutable game : Game_controller.t }
 
 let game_state : game_state =
@@ -48,10 +47,22 @@ let turn_handler _ =
     (Yojson.Safe.to_string
        (turn_to_yojson (Game_controller.return_player game_state.game)))
 
+let reset_game_handler _ =
+  let headers =
+    [
+      ("Access-Control-Allow-Origin", "*");
+      ("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+      ("Access-Control-Allow-Headers", "Content-Type");
+    ]
+  in
+  game_state.game <- Game_controller.init_game 20 Go_players.black;
+  Dream.json ~headers (Yojson.Safe.to_string (turn_to_yojson "Begin New Game"))
+
 let () =
   Dream.run @@ Dream.logger
   @@ Dream.router
        [
          Dream.post "/move" two_player_move_handler;
          Dream.get "/player_turn" turn_handler;
+         Dream.get "/reset_game" reset_game_handler;
        ]

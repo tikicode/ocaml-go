@@ -95,7 +95,6 @@ let updateGameBoard = (event, findOffset, row, col) => {
         var target = event.target;
         var offset = findOffset(mouseX, mouseY, target.getBoundingClientRect().left, target.getBoundingClientRect().right, target.getBoundingClientRect().top, target.getBoundingClientRect().bottom, squareSize);
         var divAlreadyExists = document.querySelector('[data-coordinates="' + coordinates + '"]');
-        // if (!divAlreadyExists) {
           var newDiv = document.createElement("div");
           // Apply styles to pieces
           newDiv.setAttribute("data-coordinates", coordinates);
@@ -111,7 +110,6 @@ let updateGameBoard = (event, findOffset, row, col) => {
 
           // Append the div to the document body
           document.body.appendChild(newDiv);
-        // }
         
 
         return [target.getBoundingClientRect().left, target.getBoundingClientRect().right , target.getBoundingClientRect().bottom , target.getBoundingClientRect().top ];
@@ -132,11 +130,8 @@ let updateGameBoard = (event, findOffset, row, col) => {
         if (divToRemove) {
           divToRemove.remove();
         }
-        // divToRemove = document.querySelector('[data-coordinates="' + coordinates + '"]');
-        // if (divToRemove) {
-        //   divToRemove.remove();
-        // }
       }
+
       async function makeMove(moveEndpoint) {
         console.log("Made Move");
         const response = await fetch(moveEndpoint, {
@@ -152,26 +147,26 @@ let updateGameBoard = (event, findOffset, row, col) => {
           let firstElem = pair[0];
           let secondElem = pair[1];
           let to_remove = firstElem + " " + secondElem;
-          console.log(to_remove);
-          console.log(coordinates);
-          // var alreadyExists = document.querySelectorAll('[data-coordinates="' + coordinates + '"]');
-          // if ((alreadyExists.length < 1)) {
-            removePiece(to_remove);
+          removePiece(to_remove);
         }
       }
 
-      async function getTurn(apiUrl) {
-        const response = await fetch(apiUrl, {
+      async function getTurn(turnEndpoint) {
+        const response = await fetch(turnEndpoint, {
           method: "GET", 
           cache: "no-cache",
         });
         const toPlay = await response.json();
-        if(toPlay === "White") {
-          createPiece("white");
-        } else {
-          createPiece("black");
-        }
-        console.log(toPlay);
+        let playerTurn = (toPlay === "White") ? "white" : "black";
+        createPiece(playerTurn);
+      }
+
+      async function resetGame(resetEndpoint) {
+        const response = await fetch(turnEndpoint, {
+          method: "GET", 
+          cache: "no-cache",
+        });
+        const reset = await response.json();
       }
     }
   `)
@@ -194,6 +189,19 @@ let makeGrid = (~rows, ~cols) => {
   |> Belt.List.toArray
   |> React.array
 }
+
+%%raw(`
+  let resetEndpoint = "http://localhost:8080/reset_game";
+
+  window.addEventListener('unload', async function (event) {
+      console.log("RESET!");
+      try {
+          await fetch(resetEndpoint, {method: 'GET',});
+      } catch (error) {
+          console.error("Error resetting the game:", error);
+      }
+  });
+`)
 
 @react.component
 let make = () =>

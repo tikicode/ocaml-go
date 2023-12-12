@@ -153,33 +153,31 @@ module Game_controller = struct
     | _ -> [ (23, 23) ]
 
   let run ({ bd; player; black_slots; white_slots } : t) ~ai (uses_ai : bool)
-      (inputs : string) : t =
-    match inputs with
-    | input -> (
-        match String.split_on_chars input ~on:[ ' ' ] with
-        | [ s1; s2 ] -> (
-            match (int_of_string_opt s1, int_of_string_opt s2) with
-            | Some row, Some col ->
-                let coord = (row - 1, col - 1) in
-                if check_coords bd coord then
-                  let new_board = Board.update_board bd coord player in
-                  let occupied_board, pieces = take_pieces player new_board in
-                  if check_move occupied_board player coord then
-                    let updated =
-                      update_game occupied_board player black_slots white_slots
-                        pieces
-                    in
-                    if uses_ai then (
-                      let ai_play = play_ai updated ~ai in
-                      Board.print_board ai_play.bd;
-                      ai_play)
-                    else (
-                      Board.print_board updated.bd;
-                      updated)
-                  else init_game 1 Go_players.black
-                else init_game 1 Go_players.black
-            | _ -> init_game 1 Go_players.black)
+      (input : string) : t =
+    match String.split_on_chars input ~on:[ ' ' ] with
+    | [ s1; s2 ] -> (
+        match (int_of_string_opt s1, int_of_string_opt s2) with
+        | Some row, Some col ->
+            let coord = (row - 1, col - 1) in
+            if check_coords bd coord then
+              let new_board = Board.update_board bd coord player in
+              let occupied_board, pieces = take_pieces player new_board in
+              if check_move occupied_board player coord then
+                let updated =
+                  update_game occupied_board player black_slots white_slots
+                    pieces
+                in
+                if uses_ai then (
+                  let ai_play = play_ai updated ~ai in
+                  Board.print_board ai_play.bd;
+                  ai_play)
+                else (
+                  Board.print_board updated.bd;
+                  updated)
+              else init_game 1 Go_players.black
+            else init_game 1 Go_players.black
         | _ -> init_game 1 Go_players.black)
+    | _ -> init_game 1 Go_players.black
 
   let run_two_player ({ bd; player; black_slots; white_slots } : t)
       (inputs : string) : t =
