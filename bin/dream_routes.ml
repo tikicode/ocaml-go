@@ -92,7 +92,7 @@ let () =
       Dream.post "/move" two_player_move_handler;
       Dream.get "/player_turn" turn_handler;
       Dream.get "/reset_game" reset_game_handler;
-      Dream.get "/get_score" score_handler
+      Dream.get "/get_score" score_handler;
       Dream.get "/move_ai" ai_move_handler;
     ]
 
