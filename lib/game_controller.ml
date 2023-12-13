@@ -48,9 +48,20 @@ module Game_controller = struct
     : bool =
     if Go_players.is_white player then white_slots <= 0 else black_slots <= 0
 
+  let check_coords (board : Board.t) (coord : int * int) : bool =
+    if not (Board.valid_coordinate board coord) then (
+      print_string "Invalid coordinitate.\n";
+      false)
+    else
+      let p = Board.get_player board coord in
+      if Go_players.is_blank p then true
+      else (
+        print_string "The position has already been occupied.\n";
+        false)
+
   let rec next_move_ai { bd; player; black_slots; white_slots } : string =
-    let random_coordinate = (Random.int (Board.get_size bd), Random.int (Board.get_size bd)) in
-    if not (Board.valid_coordinate bd random_coordinate) then
+    let random_coordinate = (Random.int (Board.get_size bd)), Random.int (Board.get_size bd) in
+    if not (check_coords bd random_coordinate) then
       next_move_ai { bd; player; black_slots; white_slots }
     else
       match random_coordinate with 
@@ -86,17 +97,6 @@ module Game_controller = struct
         white_slots = white_slots + pieces - 2;
       }
 
-
-  let check_coords (board : Board.t) (coord : int * int) : bool =
-    if not (Board.valid_coordinate board coord) then (
-      print_string "Invalid coordinitate.\n";
-      false)
-    else
-      let p = Board.get_player board coord in
-      if Go_players.is_blank p then true
-      else (
-        print_string "The position has already been occupied.\n";
-        false)
 
   let rec dfs (board : Board.t) (player : Go_players.t)
       (visited : (int * int, 'a) Set.t) (stack : (int * int) list) : bool =
