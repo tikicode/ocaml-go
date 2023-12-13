@@ -202,14 +202,28 @@ let makeGrid = (~rows, ~cols) => {
       }
   });
 
-  var button = document.getElementById('score-button');
+  // var button = document.getElementById('score-button');
 
-  button.addEventListener('click', function() {
-    getScore(scoreEndpoint);
-  });
+  // button.addEventListener('click', function() {
+  //   getScore(scoreEndpoint);
+  // });
 
-  
   let scoreEndpoint = "http://localhost:8080/get_score";
+
+  document.addEventListener('keydown', function(event) {
+    // Type E to end the game and see the score
+    if (event.key === 'E') {
+      getScore(scoreEndpoint);
+    } 
+    // Type A to play against out AI
+    else if(event.key === 'A') {
+      alert("AI");
+    } 
+    // Type T to play a two player game
+    else if(event.key === 'T') {
+      alert("TwoPlayer");
+    }
+  });
 
   async function getScore(scoreEndpoint) {
     const response = await fetch(scoreEndpoint, {
@@ -218,6 +232,7 @@ let makeGrid = (~rows, ~cols) => {
     });
     const score = await response.json();
 
+    // Remove all pieces on board
     var allPieces = document.querySelectorAll('div[data-coordinates]');
 
     allPieces.forEach(function(div) {
@@ -227,7 +242,7 @@ let makeGrid = (~rows, ~cols) => {
     const whiteScore = score[0];
     const blackScore = score[1];
     
-
+    // Remove grid lines from the board
     const goBoardElement = document.querySelector('.go-board');
     goBoardElement.style.gridTemplateColumns = 'repeat(19, 1fr)';
     goBoardElement.style.gridTemplateRows = 'repeat(19, 1fr)';
@@ -237,12 +252,12 @@ let makeGrid = (~rows, ~cols) => {
       intersection.style.border = 'none';
     });
     
+    // Display scores for white and black 
     const winnerDisplayElement = document.getElementById('winner-display');
     winnerDisplayElement.innerHTML = whiteScore > blackScore ? "White Wins!" : "Black Wins!";
     const scoreDisplayElement = document.getElementById('score-display');
     scoreDisplayElement.innerHTML = whiteScore + ' - ' + blackScore;
   }
-
 `)
 
 @react.component
