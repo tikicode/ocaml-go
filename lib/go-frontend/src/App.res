@@ -81,12 +81,12 @@ let findOffset = (x, y, left, right, top, bottom, squareSize) => {
   }
 }
 
-let updateGameBoard = (event, findOffset, row, col) => {
+let updateGameBoard = (event, findOffset, row, col, playingAI) => {
   let mouseX = event->ReactEvent.Mouse.clientX
   let mouseY = event->ReactEvent.Mouse.clientY
   let squareSize = 26.203125
   let partialFunCoordinates = %raw(`
-    function(event, mouseX, mouseY, squareSize, findOffset, row, col) {
+    function(event, mouseX, mouseY, squareSize, findOffset, row, col, playingAI) {
       let true_row = Math.abs(mouseY - event.target.getBoundingClientRect().top) < Math.abs(mouseY - event.target.getBoundingClientRect().bottom) ? row : row+1;
       let true_col = Math.abs(mouseX - event.target.getBoundingClientRect().left) < Math.abs(mouseX - event.target.getBoundingClientRect().right) ? col : col+1;
       var coordinates = true_row + " " + true_col;
@@ -112,8 +112,9 @@ let updateGameBoard = (event, findOffset, row, col) => {
 
         // Append the div to the document body
         document.body.appendChild(newDiv);
-
-        makeMoveAI(aiMoveEndpoint);
+        if(playingAI) {
+          makeMoveAI(aiMoveEndpoint);
+        }
         }
 
       function createPieceAI(row, col) {
@@ -144,11 +145,7 @@ let updateGameBoard = (event, findOffset, row, col) => {
       if(!alreadyExists) {
         let turnEndpoint = "http://localhost:8080/player_turn";
         getTurn(turnEndpoint)
-        // .then(_ => {
-        //     let moveEndpoint = "http://localhost:8080/move";
-        //     return makeMove(moveEndpoint);
-        //   });
-        .then(turn => {
+        .then(_ => {
             makeMove(moveEndpoint, true_row, true_col);
           });
       }
@@ -204,28 +201,107 @@ let updateGameBoard = (event, findOffset, row, col) => {
         createPiece(playerTurn);
       }
       
-      async function resetGame(resetEndpoint) {
-        const response = await fetch(turnEndpoint, {
+    }
+  `)
+  let boundingBox = partialFunCoordinates(
+    event,
+    mouseX,
+    mouseY,
+    squareSize,
+    findOffset,
+    row,
+    col,
+    playingAI,
+  )
+  Js.log(boundingBox)
+}
+
+let returnScore = %raw(` 
+  function(scoreEndpoint) {
+    getScore(scoreEndpoint);
+
+    async function getScore(scoreEndpoint) {
+      const response = await fetch(scoreEndpoint, {
+        method: "GET", 
+        cache: "no-cache",
+      });
+      const score = await response.json();
+
+      // Remove all pieces on the board
+      var allPieces = document.querySelectorAll('div[data-coordinates]');
+
+      allPieces.forEach(function(div) {
+        div.remove();
+      });
+      
+      const whiteScore = score[0];
+      const blackScore = score[1];
+      
+      // Remove grid lines from the board
+      const goBoardElement = document.querySelector('.go-board');
+      const intersections = goBoardElement.querySelectorAll('.intersection');
+      intersections.forEach(intersection => {
+        intersection.style.border = 'none';
+      });
+      
+      // Display scores for white and black 
+      const winnerDisplayElement = document.getElementById('winner-display');
+      winnerDisplayElement.innerHTML = whiteScore > blackScore ? "White Wins!" : "Black Wins!";
+      const scoreDisplayElement = document.getElementById('score-display');
+      scoreDisplayElement.innerHTML = whiteScore + ' - ' + blackScore;
+    }
+  }
+`)
+
+let resetGame = %raw(`
+    function(resetEndpoint) {
+      reset_game(resetEndpoint);
+      console.log("RESETTING");
+      async function reset_game(resetEndpoint) {
+        const response = await fetch(resetEndpoint, {
           method: "GET", 
           cache: "no-cache",
         });
         const reset = await response.json();
+        var allPieces = document.querySelectorAll('div[data-coordinates]');
+
+        allPieces.forEach(function(div) {
+        div.remove();
+      })
       }
     }
-  `)
-  let boundingBox = partialFunCoordinates(event, mouseX, mouseY, squareSize, findOffset, row, col)
-  Js.log(boundingBox)
-}
+`)
 
 let makeGrid = (~rows, ~cols) => {
   let rowArray = Belt.List.makeBy(rows, i => i)
   let colArray = Belt.List.makeBy(cols, i => i)
+  let playingAI = ref(false)
+  let resetGameEndpoint = "http://localhost:8080/reset_game"
+  let scoreEndpoint = "http://localhost:8080/get_score"
+  let handleKeyDown = event => {
+    switch ReactEvent.Keyboard.key(event) {
+    | "E" => returnScore(scoreEndpoint)
+    | "A" =>
+      playingAI := true
+      resetGame(resetGameEndpoint)
+    | "T" =>
+      playingAI := false
+      resetGame(resetGameEndpoint)
+    | _ => ()
+    }
+  }
   rowArray->Belt.List.map(row =>
     colArray->Belt.List.map(col => {
       let handleClick = event => {
-        updateGameBoard(event, findOffset, row, col)
+        updateGameBoard(event, findOffset, row, col, playingAI.contents)
       }
-      <div key={string_of_int(row * cols + col)} className="intersection" onClick={handleClick} />
+      <div
+        key={string_of_int(row * cols + col)}
+        className="intersection"
+        onClick={handleClick}
+        onKeyDown={event => handleKeyDown(event)}
+        tabIndex=0
+      />
     })
   )
   |> Belt.List.flatten
@@ -244,63 +320,6 @@ let makeGrid = (~rows, ~cols) => {
           console.error("Error resetting the game:", error);
       }
   });
-
-  // var button = document.getElementById('score-button');
-
-  // button.addEventListener('click', function() {
-  //   getScore(scoreEndpoint);
-  // });
-
-  let scoreEndpoint = "http://localhost:8080/get_score";
-
-  document.addEventListener('keydown', function(event) {
-    // Type E to end the game and see the score
-    if (event.key === 'E') {
-      getScore(scoreEndpoint);
-    } 
-    // Type A to play against out AI
-    else if(event.key === 'A') {
-      alert("AI");
-    } 
-    // Type T to play a two player game
-    else if(event.key === 'T') {
-      alert("TwoPlayer");
-    }
-  });
-
-  async function getScore(scoreEndpoint) {
-    const response = await fetch(scoreEndpoint, {
-      method: "GET", 
-      cache: "no-cache",
-    });
-    const score = await response.json();
-
-    // Remove all pieces on board
-    var allPieces = document.querySelectorAll('div[data-coordinates]');
-
-    allPieces.forEach(function(div) {
-      div.remove();
-    });
-    
-    const whiteScore = score[0];
-    const blackScore = score[1];
-    
-    // Remove grid lines from the board
-    const goBoardElement = document.querySelector('.go-board');
-    goBoardElement.style.gridTemplateColumns = 'repeat(19, 1fr)';
-    goBoardElement.style.gridTemplateRows = 'repeat(19, 1fr)';
-
-    const intersections = goBoardElement.querySelectorAll('.intersection');
-    intersections.forEach(intersection => {
-      intersection.style.border = 'none';
-    });
-    
-    // Display scores for white and black 
-    const winnerDisplayElement = document.getElementById('winner-display');
-    winnerDisplayElement.innerHTML = whiteScore > blackScore ? "White Wins!" : "Black Wins!";
-    const scoreDisplayElement = document.getElementById('score-display');
-    scoreDisplayElement.innerHTML = whiteScore + ' - ' + blackScore;
-  }
 `)
 
 @react.component
