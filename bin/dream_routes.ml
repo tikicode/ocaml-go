@@ -72,7 +72,7 @@ let score_handler _ =
   let black_score = Game_controller.game_done_black_score final_board in
     Dream.json ~headers
       (Yojson.Safe.to_string
-         (turn_to_yojson (Game_controller.game_decide_winner white_score black_score)))
+         (data_to_yojson (white_score, black_score)))
 
 let reset_game_handler _ =
   let headers =

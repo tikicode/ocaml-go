@@ -17,7 +17,6 @@ module Game_controller : sig
   val next_move_ai : t -> string
   val dfs :
     Board.t -> Go_players.t -> (int * int, 'a) Set.t -> (int * int) list -> bool
-  val game_decide_winner : int -> int -> string
 
   val is_alive : Board.t -> Go_players.t -> int * int -> bool
   val check_move : Board.t -> Go_players.t -> int * int -> bool

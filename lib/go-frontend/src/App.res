@@ -161,14 +161,6 @@ let updateGameBoard = (event, findOffset, row, col) => {
         createPiece(playerTurn);
       }
       
-      async function getScore(scoreEndpoint) {
-        const response = await fetch(turnEndpoint, {
-          method: "GET", 
-          cache: "no-cache",
-        });
-        const score = await response.json();
-      }
-      
       async function resetGame(resetEndpoint) {
         const response = await fetch(turnEndpoint, {
           method: "GET", 
@@ -212,11 +204,45 @@ let makeGrid = (~rows, ~cols) => {
 
   var button = document.getElementById('score-button');
 
-  // Add a click event listener to the button
   button.addEventListener('click', function() {
-    alert('test')
-    // You can perform any other actions or functions here
+    getScore(scoreEndpoint);
   });
+
+  
+  let scoreEndpoint = "http://localhost:8080/get_score";
+
+  async function getScore(scoreEndpoint) {
+    const response = await fetch(scoreEndpoint, {
+      method: "GET", 
+      cache: "no-cache",
+    });
+    const score = await response.json();
+
+    var allPieces = document.querySelectorAll('div[data-coordinates]');
+
+    allPieces.forEach(function(div) {
+      div.remove();
+    });
+    
+    const whiteScore = score[0];
+    const blackScore = score[1];
+    
+
+    const goBoardElement = document.querySelector('.go-board');
+    goBoardElement.style.gridTemplateColumns = 'repeat(19, 1fr)';
+    goBoardElement.style.gridTemplateRows = 'repeat(19, 1fr)';
+
+    const intersections = goBoardElement.querySelectorAll('.intersection');
+    intersections.forEach(intersection => {
+      intersection.style.border = 'none';
+    });
+    
+    const winnerDisplayElement = document.getElementById('winner-display');
+    winnerDisplayElement.innerHTML = whiteScore > blackScore ? "White Wins!" : "Black Wins!";
+    const scoreDisplayElement = document.getElementById('score-display');
+    scoreDisplayElement.innerHTML = whiteScore + ' - ' + blackScore;
+  }
+
 `)
 
 @react.component
