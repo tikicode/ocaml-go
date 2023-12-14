@@ -200,7 +200,6 @@ let updateGameBoard = (event, findOffset, row, col, playingAI) => {
         let playerTurn = (toPlay === "White") ? "white" : "black";
         createPiece(playerTurn);
       }
-      
     }
   `)
   let boundingBox = partialFunCoordinates(
@@ -272,12 +271,27 @@ let resetGame = %raw(`
     }
 `)
 
+let passTurn = %raw(`
+    function(passTurnEndpoint) {
+      pass_turn(passTurnEndpoint);
+      console.log("PASSING TURN");
+      async function pass_turn(passTurnEndpoint) {
+        const response = await fetch(passTurnEndpoint, {
+          method: "GET", 
+          cache: "no-cache",
+        });
+        const turn = await response.json();
+      }
+    }
+`)
+
 let makeGrid = (~rows, ~cols) => {
   let rowArray = Belt.List.makeBy(rows, i => i)
   let colArray = Belt.List.makeBy(cols, i => i)
   let playingAI = ref(false)
   let resetGameEndpoint = "http://localhost:8080/reset_game"
   let scoreEndpoint = "http://localhost:8080/get_score"
+  let passTurnEndpoint = "http://localhost:8080/pass_turn"
   let handleKeyDown = event => {
     switch ReactEvent.Keyboard.key(event) {
     | "E" => returnScore(scoreEndpoint)
@@ -287,6 +301,7 @@ let makeGrid = (~rows, ~cols) => {
     | "T" =>
       playingAI := false
       resetGame(resetGameEndpoint)
+    | "P" => passTurn(passTurnEndpoint)
     | _ => ()
     }
   }

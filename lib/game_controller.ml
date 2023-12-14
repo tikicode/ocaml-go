@@ -44,6 +44,10 @@ module Game_controller = struct
 
   let return_player { player; _ } : string = Go_players.to_string player
 
+  let pass_turn { bd; player; black_slots; white_slots } : t = 
+    let new_player = Go_players.opposite player in 
+    { bd; player=new_player; black_slots; white_slots }
+
   let check_done (player : Go_players.t) (black_slots : int) (white_slots : int)
     : bool =
     if Go_players.is_white player then white_slots <= 0 else black_slots <= 0

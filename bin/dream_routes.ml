@@ -85,6 +85,20 @@ let reset_game_handler _ =
   game_state.game <- Game_controller.init_game 20 Go_players.black;
   Dream.json ~headers (Yojson.Safe.to_string (turn_to_yojson "Begin New Game"))
 
+let pass_turn_handler _ =
+  let headers =
+    [
+      ("Access-Control-Allow-Origin", "*");
+      ("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+      ("Access-Control-Allow-Headers", "Content-Type");
+    ]
+  in
+  game_state.game <- Game_controller.pass_turn game_state.game;
+  Dream.json ~headers (Yojson.Safe.to_string (turn_to_yojson "Changed"))
+
+
+
+
 let () =
   Dream.run @@ Dream.logger
   @@ Dream.router
@@ -94,5 +108,6 @@ let () =
       Dream.get "/reset_game" reset_game_handler;
       Dream.get "/get_score" score_handler;
       Dream.get "/move_ai" ai_move_handler;
+      Dream.get "/pass_turn" pass_turn_handler;
     ]
 

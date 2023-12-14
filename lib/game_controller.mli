@@ -24,6 +24,7 @@ module Game_controller : sig
   val return_dead : Go_players.t -> Board.t -> (int * int) list
   val play_ai : t -> ai:(Board.t -> Go_players.t -> int -> int -> t) -> t
   val return_player : t -> string
+  val pass_turn : t -> t
 
   val run :
     t -> ai:(Board.t -> Go_players.t -> int -> int -> t) -> bool -> string -> t
