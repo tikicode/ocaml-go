@@ -1,4 +1,4 @@
-## Project Milestone 1: Go
+## Project: Go
 
 ### Rules
 
@@ -10,11 +10,11 @@ The following rules are either copied or adapted from "The Rules and Elements of
 - A player may pass their turn at any time.
 - A stone or solidly connected group of stones of one color is captured and removed from the board when all the intersections directly adjacent to it are occupied by the enemy. (Capture of the enemy takes precedence over self-capture.)
 - No stone may be played so as to recreate a former board position.
-- The end of the game is reached when neither player can place down a piece without losing it
-  or if there is a player with significantly more area than the other player. The game end is
+- The end of the game is reached when neither player can place down a piece without losing it. The game end is
   typically determined by both players before all positions on the board are occupied.
 - A player's area consists of all the points the player has either occupied or surrounded.
 - The player with more area wins.
+- To account for the advantage of the black player being able to go first, the white player gains 6 points at the end of the game. 
 
 ### Usage
 
@@ -268,7 +268,7 @@ In the board above, white's score would be:
 15 [  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ]
 16 [  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ]
 
-35 points
+35 + 6 = 41 points
 ```
 
 #### Example 2
@@ -314,7 +314,7 @@ In the board above, white's score would be:
 15 [  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][36][  ][  ]
 16 [  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ]
 
-36 points
+36 + 6 = 42 points
 ```
 
 Black's score would be:
@@ -342,7 +342,3 @@ Black's score would be:
 ```
 
 so the winner is white
-
-### Code Style
-
-Do not use mutations
