@@ -92,6 +92,7 @@ let test_print_board _ =
   let () = Board.print_board test_board in
   assert_bool "Manually verify board is correct" true
 
+
 let test_is_empty _ =
   assert_equal true (Go_players.is_empty Go_players.empty);
   assert_equal false (Go_players.is_empty Go_players.white);
@@ -203,7 +204,26 @@ let test_passturn _ =
   let same_board = Game_controller.return_board new_state in
   assert_equal new_player "White";
   assert_equal same_board (Board.init_board 3)
-  
+
+let test_conv_string_to_pair_list _ = 
+  let new_list = Game_controller.conv_string_to_pair_list ("12 12") in 
+  assert_equal new_list [(11,11)]
+
+let test_check_done _ = 
+  assert_equal (Game_controller.check_done Go_players.white 10 10) false;
+  assert_equal (Game_controller.check_done Go_players.white 0 10) false;
+  assert_equal (Game_controller.check_done Go_players.black 10 10) false;
+  assert_equal (Game_controller.check_done Go_players.black 10 0) false;
+  assert_equal (Game_controller.check_done Go_players.black 0 0) true;
+  assert_equal (Game_controller.check_done Go_players.white 0 0) true
+
+let test_update_game _ = 
+  let new_game = Game_controller.update_game updated_board Go_players.white 5 5 2 in 
+  let new_game2 = Game_controller.update_game updated_board Go_players.black 5 5 0 in 
+  assert_equal (Game_controller.return_white_slots new_game) 6;
+  assert_equal (Game_controller.return_black_slots new_game) 5;
+  assert_equal (Game_controller.return_white_slots new_game2) 4;
+  assert_equal (Game_controller.return_black_slots new_game2) 4
 
 let suite =
   "Go Test Suite" >:::
@@ -237,6 +257,9 @@ let suite =
       "check picked pieces" >:: test_take_pieces;
       "check scoring" >:: test_scoring;
       "check pass turn" >:: test_passturn;
+      "check done" >:: test_check_done;
+      "test_conv_string_to_pair_list" >:: test_conv_string_to_pair_list;
+      "test_update_game" >:: test_update_game;
     ];
   ]
 
