@@ -2,6 +2,7 @@ open OUnit2
 open Go
 open Board
 open Players
+open Game_controller
 
 let test_init_board _ =
   let bd = Board.return_list (Board.init_board 3) in
@@ -156,6 +157,54 @@ let test_to_string _ =
   assert_equal "Black" (Go_players.to_string Go_players.blackhold);
   assert_equal "White" (Go_players.to_string Go_players.whitehold)
 
+
+let test_init _ = 
+  let game = Game_controller.init_game 3 Go_players.black 
+  in assert_equal (Board.get_board(Game_controller.return_board game)) [(2, 2); (2, 1); (2, 0); (1, 2); (1, 1); (1, 0); (0, 2); (0, 1); (0, 0)];
+  assert_equal (Game_controller.return_player game) "Black";
+  assert_equal (Game_controller.return_black_slots game) 9;
+  assert_equal (Game_controller.return_white_slots game) 9
+
+let test_check_board _ = 
+  let test_board = Board.init_board 3 in 
+  assert_equal (Game_controller.check_coords test_board (19,19)) false
+
+let init_board = Board.init_board 5 
+let updated_board = Board.update_board init_board (1, 1) Go_players.white 
+let updated_board = Board.update_board updated_board (0, 1) Go_players.black 
+let updated_board = Board.update_board updated_board (1, 0) Go_players.black 
+let updated_board = Board.update_board updated_board (1, 2) Go_players.black 
+let updated_board = Board.update_board updated_board (2, 1) Go_players.black 
+
+let picked_board = Board.update_board init_board (0, 1) Go_players.black 
+let picked_board = Board.update_board picked_board (1, 0) Go_players.black 
+let picked_board = Board.update_board picked_board (1, 2) Go_players.black 
+let picked_board = Board.update_board picked_board (2, 1) Go_players.black 
+let picked_board = Board.update_board picked_board (1, 1) Go_players.blackhold
+
+let test_is_alive _ = 
+  let dead_pieces =  (Game_controller.return_dead Go_players.black updated_board) in 
+  assert_equal dead_pieces [(1,1)]
+
+let test_take_pieces _ = 
+  let (new_board, dead_len) = (Game_controller.take_pieces Go_players.black updated_board) in 
+  assert_equal dead_len 1;
+  assert_equal new_board picked_board
+
+let test_scoring _ = 
+  let white_score = Game_controller.game_done_white_score picked_board in 
+  let black_score = Game_controller.game_done_black_score picked_board in 
+  assert_equal white_score 6;
+  assert_equal black_score 5
+
+let test_passturn _ = 
+  let new_state = Game_controller.pass_turn (Game_controller.init_game 3 Go_players.black) in 
+  let new_player = Game_controller.return_player new_state in 
+  let same_board = Game_controller.return_board new_state in
+  assert_equal new_player "White";
+  assert_equal same_board (Board.init_board 3)
+  
+
 let suite =
   "Go Test Suite" >:::
   [
@@ -179,6 +228,15 @@ let suite =
       "test_opposite" >:: test_opposite;
       "test_hold" >:: test_hold;
       "test_to_string" >:: test_to_string;
+    ];
+    "Game Controller Test Suite" >:::
+    [
+      "init game" >:: test_init;
+      "check coords" >:: test_check_board;
+      "check alive" >:: test_is_alive;
+      "check picked pieces" >:: test_take_pieces;
+      "check scoring" >:: test_scoring;
+      "check pass turn" >:: test_passturn;
     ];
   ]
 

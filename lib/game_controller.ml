@@ -17,6 +17,12 @@ module Game_controller = struct
       black_slots = size * size;
       white_slots = size * size;
     }
+  
+  let return_black_slots { black_slots; _} : int = 
+    black_slots
+  
+  let return_white_slots { white_slots; _ } : int = 
+    white_slots
 
   let game_done (bd : Board.t) (white_handi : int) (black_handi : int) : unit =
     let black_score =
