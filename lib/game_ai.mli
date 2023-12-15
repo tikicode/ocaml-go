@@ -24,4 +24,5 @@ open Players
      val play_game : int -> int -> unit
    end *)
 
+val open_center_positions : Board.t -> (int * int) list
 val random_player : Board.t -> Go_players.t -> int -> int -> Game_controller.t

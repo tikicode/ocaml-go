@@ -42,15 +42,15 @@ module Board = struct
 
   let update_board ({ board; size } : t) ((x, y) : int * int) (p : Go_players.t)
       : t =
-    let new_board = List.mapi ~f:(fun i row ->
-      if i = x then
-        List.mapi ~f:(fun j elem ->
-          if j = y then p else elem
-        ) row
-      else
-        row
-    ) board in
-    {board = new_board; size}
+    let new_board =
+      List.mapi
+        ~f:(fun i row ->
+          if i = x then
+            List.mapi ~f:(fun j elem -> if j = y then p else elem) row
+          else row)
+        board
+    in
+    { board = new_board; size }
 
   let get_board (bd : t) : (int * int) list =
     let rec aux (x : int) (y : int) (coords : (int * int) list) :

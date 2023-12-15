@@ -17,12 +17,9 @@ module Game_controller = struct
       black_slots = size * size;
       white_slots = size * size;
     }
-  
-  let return_black_slots { black_slots; _} : int = 
-    black_slots
-  
-  let return_white_slots { white_slots; _ } : int = 
-    white_slots
+
+  let return_black_slots { black_slots; _ } : int = black_slots
+  let return_white_slots { white_slots; _ } : int = white_slots
 
   let game_done (bd : Board.t) (white_handi : int) (black_handi : int) : unit =
     let black_score =
@@ -45,17 +42,16 @@ module Game_controller = struct
 
   let game_done_black_score (bd : Board.t) : int =
     Board.count bd ~f:(Go_players.is_consistent Go_players.black)
-  
-  let return_board { bd; _ } : Board.t = bd
 
+  let return_board { bd; _ } : Board.t = bd
   let return_player { player; _ } : string = Go_players.to_string player
 
-  let pass_turn { bd; player; black_slots; white_slots } : t = 
-    let new_player = Go_players.opposite player in 
-    { bd; player=new_player; black_slots; white_slots }
+  let pass_turn { bd; player; black_slots; white_slots } : t =
+    let new_player = Go_players.opposite player in
+    { bd; player = new_player; black_slots; white_slots }
 
   let check_done (player : Go_players.t) (black_slots : int) (white_slots : int)
-    : bool =
+      : bool =
     if Go_players.is_white player then white_slots <= 0 else black_slots <= 0
 
   let check_coords (board : Board.t) (coord : int * int) : bool =
@@ -70,12 +66,14 @@ module Game_controller = struct
         false)
 
   let rec next_move_ai { bd; player; black_slots; white_slots } : string =
-    let random_coordinate = (Random.int (Board.get_size bd)), Random.int (Board.get_size bd) in
+    let random_coordinate =
+      (Random.int (Board.get_size bd), Random.int (Board.get_size bd))
+    in
     if not (check_coords bd random_coordinate) then
       next_move_ai { bd; player; black_slots; white_slots }
     else
-      match random_coordinate with 
-      |(x,y) -> string_of_int x ^ " " ^ string_of_int y
+      match random_coordinate with
+      | x, y -> string_of_int x ^ " " ^ string_of_int y
 
   let conv_string_to_pair_list move =
     match String.split move ~on:' ' with
@@ -107,26 +105,25 @@ module Game_controller = struct
         white_slots = white_slots + pieces - 2;
       }
 
-
   let rec dfs (board : Board.t) (player : Go_players.t)
       (visited : (int * int, 'a) Set.t) (stack : (int * int) list) : bool =
     match stack with
     | [] -> false
     | coord :: st when Set.mem visited coord -> dfs board player visited st
     | coord :: st ->
-      let p = Board.get_player board coord in
-      if Go_players.is_blank p then true
-      else if not (Go_players.is_same player p) then
-        dfs board player visited st
-      else
-        let neighbours = Board.get_neighbours board coord in
-        let unvisited =
-          List.filter neighbours ~f:(fun c -> not (Set.mem visited c))
-        in
-        dfs board player (Set.add visited coord) (unvisited @ st)
+        let p = Board.get_player board coord in
+        if Go_players.is_blank p then true
+        else if not (Go_players.is_same player p) then
+          dfs board player visited st
+        else
+          let neighbours = Board.get_neighbours board coord in
+          let unvisited =
+            List.filter neighbours ~f:(fun c -> not (Set.mem visited c))
+          in
+          dfs board player (Set.add visited coord) (unvisited @ st)
 
   let is_alive (bd : Board.t) (player : Go_players.t) (coord : int * int) : bool
-    =
+      =
     let p = Board.get_player bd coord in
     if Go_players.is_blank p then true
     else if Go_players.is_same player p then true
@@ -135,7 +132,7 @@ module Game_controller = struct
       dfs bd p set [ coord ]
 
   let check_move (bd : Board.t) (player : Go_players.t) (coord : int * int) :
-    bool =
+      bool =
     is_alive bd (Go_players.opposite player) coord
 
   let get_white_slots { white_slots; _ } = white_slots
@@ -164,11 +161,11 @@ module Game_controller = struct
     | [ s1; s2 ] -> (
         match (int_of_string_opt s1, int_of_string_opt s2) with
         | Some row, Some col ->
-          let coord = (row - 1, col - 1) in
-          if check_coords bd coord then
-            let new_board = Board.update_board bd coord player in
-            return_dead player new_board
-          else [ (21, 21) ]
+            let coord = (row - 1, col - 1) in
+            if check_coords bd coord then
+              let new_board = Board.update_board bd coord player in
+              return_dead player new_board
+            else [ (21, 21) ]
         | _ -> [ (22, 22) ])
     | _ -> [ (23, 23) ]
 
@@ -178,24 +175,21 @@ module Game_controller = struct
     | [ s1; s2 ] -> (
         match (int_of_string_opt s1, int_of_string_opt s2) with
         | Some row, Some col ->
-          let coord = (row - 1, col - 1) in
-          if check_coords bd coord then
-            let new_board = Board.update_board bd coord player in
-            let occupied_board, pieces = take_pieces player new_board in
-            if check_move occupied_board player coord then
-              let updated =
-                update_game occupied_board player black_slots white_slots
-                  pieces
-              in
-              if uses_ai then (
-                let ai_play = play_ai updated ~ai in
-                Board.print_board ai_play.bd;
-                ai_play)
-              else (
-                Board.print_board updated.bd;
-                updated)
+            let coord = (row - 1, col - 1) in
+            if check_coords bd coord then
+              let new_board = Board.update_board bd coord player in
+              let occupied_board, pieces = take_pieces player new_board in
+              if check_move occupied_board player coord then
+                let updated =
+                  update_game occupied_board player black_slots white_slots
+                    pieces
+                in
+                if uses_ai then
+                  let ai_play = play_ai updated ~ai in
+                  ai_play
+                else updated
+              else init_game 1 Go_players.black
             else init_game 1 Go_players.black
-          else init_game 1 Go_players.black
         | _ -> init_game 1 Go_players.black)
     | _ -> init_game 1 Go_players.black
 
@@ -227,40 +221,39 @@ module Game_controller = struct
           | [ s1; s2 ] -> (
               match (int_of_string_opt s1, int_of_string_opt s2) with
               | Some row, Some col ->
-                let coord = (row - 1, col - 1) in
-                if check_coords bd coord then (
-                  let new_board = Board.update_board bd coord player in
-                  Board.print_board new_board;
-                  let occupied_board, pieces = take_pieces player new_board in
-                  if check_move occupied_board player coord then
-                    let new_board =
-                      update_game occupied_board player black_slots
-                        white_slots pieces
-                    in
-                    if uses_ai then
-                      run_console (play_ai new_board ~ai) ~ai uses_ai
-                    else run_console new_board ~ai uses_ai
-                  else (
-                    print_string "The position will make your piece(s) dead\n";
+                  let coord = (row - 1, col - 1) in
+                  if check_coords bd coord then
+                    let new_board = Board.update_board bd coord player in
+                    let occupied_board, pieces = take_pieces player new_board in
+                    if check_move occupied_board player coord then
+                      let new_board =
+                        update_game occupied_board player black_slots
+                          white_slots pieces
+                      in
+                      if uses_ai then
+                        run_console (play_ai new_board ~ai) ~ai uses_ai
+                      else run_console new_board ~ai uses_ai
+                    else (
+                      print_string "The position will make your piece(s) dead\n";
+                      run_console
+                        { bd; player; black_slots; white_slots }
+                        ~ai uses_ai)
+                  else
                     run_console
                       { bd; player; black_slots; white_slots }
-                      ~ai uses_ai))
-                else
+                      ~ai uses_ai
+              | _ ->
+                  print_string "Invalid input.\n";
                   run_console
                     { bd; player; black_slots; white_slots }
-                    ~ai uses_ai
-              | _ ->
-                print_string "Invalid input.\n";
-                run_console
-                  { bd; player; black_slots; white_slots }
-                  ~ai uses_ai)
+                    ~ai uses_ai)
           | _ ->
-            print_string
-              "Invalid input format. Please enter coordinates as 'row col'.\n";
-            run_console { bd; player; black_slots; white_slots } ~ai uses_ai))
+              print_string
+                "Invalid input format. Please enter coordinates as 'row col'.\n";
+              run_console { bd; player; black_slots; white_slots } ~ai uses_ai))
 
   let run_two_player_console ({ bd; player; black_slots; white_slots } : t) :
-    unit =
+      unit =
     run_console
       { bd; player; black_slots; white_slots }
       ~ai:(fun _ _ _ _ -> { bd; player; black_slots; white_slots })

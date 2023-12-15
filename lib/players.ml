@@ -27,7 +27,6 @@ module Go_players = struct
     match p with White -> 'W' | Black -> 'B' | _ -> ' '
 
   let opposite (p : t) : t = if p = White then Black else White
-  
   let hold (p : t) : t = if p = White then WhiteHold else BlackHold
 
   let to_string (p : t) : string =

@@ -15,11 +15,12 @@ module Game_controller : sig
   val check_coords : Board.t -> int * int -> bool
   val return_board : t -> Board.t
   val next_move_ai : t -> string
+
   val dfs :
     Board.t -> Go_players.t -> (int * int, 'a) Set.t -> (int * int) list -> bool
+
   val return_black_slots : t -> int
   val return_white_slots : t -> int
-
   val is_alive : Board.t -> Go_players.t -> int * int -> bool
   val check_move : Board.t -> Go_players.t -> int * int -> bool
   val take_pieces : Go_players.t -> Board.t -> Board.t * int
