@@ -42,15 +42,15 @@ module Board = struct
 
   let update_board ({ board; size } : t) ((x, y) : int * int) (p : Go_players.t)
       : t =
-    let rows_before = List.take board x in
-    let rows_cur_after = List.drop board x in
-    let target_row = List.hd_exn rows_cur_after in
-    let rows_after = List.tl_exn rows_cur_after in
-    let cols_before = List.take target_row y in
-    let cols_cur_after = List.drop target_row y in
-    let cols_after = List.tl_exn cols_cur_after in
-    let new_row = cols_before @ (p :: cols_after) in
-    { board = rows_before @ (new_row :: rows_after); size }
+    let new_board = List.mapi ~f:(fun i row ->
+      if i = x then
+        List.mapi ~f:(fun j elem ->
+          if j = y then p else elem
+        ) row
+      else
+        row
+    ) board in
+    {board = new_board; size}
 
   let get_board (bd : t) : (int * int) list =
     let rec aux (x : int) (y : int) (coords : (int * int) list) :
