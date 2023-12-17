@@ -22,6 +22,8 @@ To use the api: enter into bin/ and run 'dune build', followed by 'dune exec -- 
 To use the frontend: enter into lib/go-frontend and run 'npm run build', followed by npm start.
 Use node version 17 and above
 
+Key strokes: type ‘E’ to end game, ’T’ for two player, and ‘A’ to play against AI. ’T’ and ‘A’ clears the game state. 
+
 Create a simple implementation of Go game in OCaml. This is the first part of a project. The game have two players - white pieces and black pieces. The starting state should be an empty board of 16 \* 16 that looks like the following:
 
 ```
