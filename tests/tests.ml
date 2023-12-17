@@ -3,6 +3,7 @@ open Go
 open Board
 open Players
 open Game_controller
+open Game_ai
 
 let test_init_board _ =
   let bd = Board.return_list (Board.init_board 3) in
@@ -242,6 +243,30 @@ let test_run _ =
   assert_equal (Game_controller.return_board removed_state) updated_board
 
 
+let test_open_center_positions _ = 
+  let board_size = 4 in
+  let test_board = Board.init_board board_size in
+  let updated_board1 = Board.update_board test_board (1, 1) Go_players.white in
+  let updated_board2 = Board.update_board updated_board1 (1, 2) Go_players.black in
+  let updated_board3 = Board.update_board updated_board2 (2, 1) Go_players.white in
+  let updated_board4 = Board.update_board updated_board3 (2, 2) Go_players.black in
+  assert_equal (open_center_positions test_board) @@ [(1, 1); (1, 2); (2, 1); (2, 2)];
+  assert_equal (open_center_positions updated_board1) @@ [(1, 2); (2,1); (2,2)];
+  assert_equal (open_center_positions updated_board2) @@ [(2,1); (2,2)];
+  assert_equal (open_center_positions updated_board3) @@ [(2,2)];
+  assert_equal (open_center_positions updated_board4) @@ []
+
+let test_random_player _ = 
+  let board_size = 2 in
+  let test_board = Board.init_board board_size in
+  let updated_board1 = Board.update_board test_board (0, 0) Go_players.white in
+  let updated_board2 = Board.update_board updated_board1 (0, 1) Go_players.black in
+  let updated_board3 = Board.update_board updated_board2 (1, 0) Go_players.white in
+  let random_move = random_player updated_board3 Go_players.black 1 2 in
+  let random_move2 = random_player (Game_controller.return_board random_move) Go_players.white 0 2 in
+  assert_equal (Game_controller.return_black_slots random_move) @@ 2;
+  assert_equal (Game_controller.return_white_slots random_move2) @@ 1
+
 let suite =
   "Go Test Suite" >:::
   [
@@ -278,6 +303,10 @@ let suite =
       "test_conv_string_to_pair_list" >:: test_conv_string_to_pair_list;
       "test_update_game" >:: test_update_game;
       "test_run" >:: test_run;
+    ];
+    "Game AI Test Suite" >::: [
+      "open_center_positions" >:: test_open_center_positions;
+      "random_player" >:: test_random_player;
     ];
   ]
 

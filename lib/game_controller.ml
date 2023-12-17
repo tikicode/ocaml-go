@@ -29,6 +29,7 @@ module Game_controller = struct
     let white_score =
       Board.count bd ~f:(Go_players.is_consistent Go_players.white)
       + 6 + white_handi
+      (* change to use game_done white or black *)
     in
     Printf.printf "\nThe score of player Black is: %d\n" black_score;
     Printf.printf "The score of player White is: %d\n" white_score;
@@ -74,6 +75,13 @@ module Game_controller = struct
     else
       match random_coordinate with
       | x, y -> string_of_int x ^ " " ^ string_of_int y
+  (* modify this to use the Game_ai funciton *)
+  (* or move the random into this? need to figure out a better way to
+     do this for the front end bc we need to pass the current game state back
+     to do predictions later.
+     May also need to make mutable tree on front end, fk i should've done
+     this earlier lmao
+  *)
 
   let conv_string_to_pair_list move =
     match String.split move ~on:' ' with
