@@ -9,6 +9,7 @@ module Go_players : sig
   val is_empty : t -> bool
   val is_blank : t -> bool
   val is_white : t -> bool
+  val is_black : t -> bool
   val is_same : t -> t -> bool
   val is_consistent : t -> t -> bool
   val to_char : t -> char

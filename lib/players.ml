@@ -12,6 +12,7 @@ module Go_players = struct
     match p with Empty | WhiteHold | BlackHold -> true | _ -> false
 
   let is_white (p : t) : bool = p = White
+  let is_black (p : t) : bool = p = Black
 
   let is_consistent (p1 : t) (p2 : t) : bool =
     if p1 = p2 then true

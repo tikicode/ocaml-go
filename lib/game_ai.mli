@@ -1,4 +1,3 @@
-open Game_controller
 open Board
 open Players
 
@@ -25,4 +24,4 @@ open Players
    end *)
 
 val open_center_positions : Board.t -> (int * int) list
-val random_player : Board.t -> Go_players.t -> int -> int -> Game_controller.t
+val random_player : Board.t -> Go_players.t -> int -> int -> string

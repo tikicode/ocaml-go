@@ -54,5 +54,15 @@ module Rules = struct
         print_string "The position has already been occupied.\n";
         false)
 
-  (* remove duplicated valid functionality in is_alive etc. *)
+  let take_pieces (player : Go_players.t) (bd : Board.t) : Board.t * int =
+    let coords = Board.get_board bd in
+    let holden = Go_players.hold player in
+    let deads =
+      List.filter coords ~f:(fun coord -> not (is_alive bd player coord))
+    in
+    let new_board =
+      List.fold deads ~init:bd ~f:(fun bd coord ->
+          Board.update_board bd coord holden)
+    in
+    (new_board, List.length deads)
 end

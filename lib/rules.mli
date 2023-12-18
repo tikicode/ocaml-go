@@ -13,4 +13,5 @@ module Rules : sig
   val check_move : Board.t -> Go_players.t -> int * int -> bool
   val check_done : Go_players.t -> int -> int -> bool
   val check_coords : Board.t -> int * int -> bool
+  val take_pieces : Go_players.t -> Board.t -> Board.t * int
 end

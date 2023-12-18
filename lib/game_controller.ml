@@ -33,28 +33,13 @@ module Game_controller = struct
     else Printf.printf "It's a tie!\n"
 
   let return_board { bd; _ } : Board.t = bd
-  let return_player { player; _ } : string = Go_players.to_string player
+  let return_player_name { player; _ } : string = Go_players.to_string player
+
+  let return_player {player; _} : Go_players.t = player
 
   let pass_turn { bd; player; black_slots; white_slots } : t =
     let new_player = Go_players.opposite player in
     { bd; player = new_player; black_slots; white_slots }
-
-  let rec next_move_ai { bd; player; black_slots; white_slots } : string =
-    let random_coordinate =
-      (Random.int (Board.get_size bd), Random.int (Board.get_size bd))
-    in
-    if not (Rules.check_coords bd random_coordinate) then
-      next_move_ai { bd; player; black_slots; white_slots }
-    else
-      match random_coordinate with
-      | x, y -> string_of_int x ^ " " ^ string_of_int y
-  (* modify this to use the Game_ai funciton *)
-  (* or move the random into this? need to figure out a better way to
-     do this for the front end bc we need to pass the current game state back
-     to do predictions later.
-     May also need to make mutable tree on front end, fk i should've done
-     this earlier lmao
-  *)
 
   let conv_string_to_pair move =
     match String.split move ~on:' ' with
@@ -86,18 +71,6 @@ module Game_controller = struct
         white_slots = white_slots + pieces - 2;
       }
 
-  let take_pieces (player : Go_players.t) (bd : Board.t) : Board.t * int =
-    let coords = Board.get_board bd in
-    let holden = Go_players.hold player in
-    let deads =
-      List.filter coords ~f:(fun coord -> not (Rules.is_alive bd player coord))
-    in
-    let new_board =
-      List.fold deads ~init:bd ~f:(fun bd coord ->
-          Board.update_board bd coord holden)
-    in
-    (new_board, List.length deads)
-
   let return_dead (player : Go_players.t) (bd : Board.t) : (int * int) list =
     let coords = Board.get_board bd in
     List.filter coords ~f:(fun coord -> not (Rules.is_alive bd player coord))
@@ -120,7 +93,7 @@ module Game_controller = struct
 
   let get_white_slots { white_slots; _ } = white_slots
 
-  let run ({ bd; player; black_slots; white_slots } : t) ~ai (uses_ai : bool)
+  let run ({ bd; player; black_slots; white_slots } : t)
       (input : string) : t =
     match String.split_on_chars input ~on:[ ' ' ] with
     | [ s1; s2 ] -> (
@@ -129,88 +102,71 @@ module Game_controller = struct
             let coord = (row - 1, col - 1) in
             if Rules.check_coords bd coord then
               let new_board = Board.update_board bd coord player in
-              let occupied_board, pieces = take_pieces player new_board in
+              let occupied_board, pieces = Rules.take_pieces player new_board in
               if Rules.check_move occupied_board player coord then
-                let updated =
                   update_game occupied_board player black_slots white_slots
                     pieces
-                in
-                if uses_ai then
-                  let ai_play = play_ai updated ~ai in
-                  ai_play
-                else updated
               else init_game 1 Go_players.black
             else init_game 1 Go_players.black
         | _ -> init_game 1 Go_players.black)
     | _ -> init_game 1 Go_players.black
 
-  let run_two_player ({ bd; player; black_slots; white_slots } : t)
-      (inputs : string) : t =
-    run
-      { bd; player; black_slots; white_slots }
-      ~ai:(fun _ _ _ _ -> { bd; player; black_slots; white_slots })
-      false inputs
+  let compare_tuples (x1, y1: (int * int)) (x2, y2 : (int * int)) : bool = 
+    if x1 = x2 && y1 = y2 then true else false
 
-  let run_player_vs_ai ({ bd; player; black_slots; white_slots } : t) ~ai
-      (inputs : string) : t =
-    run (play_ai { bd; player; black_slots; white_slots } ~ai) ~ai true inputs
-
-  let rec run_console ({ bd; player; black_slots; white_slots } : t) ~ai
-      (uses_ai : bool) : unit =
-    if Rules.check_done player black_slots white_slots then game_done bd 0 0
-    else (
+  let rec run_console ({ bd; player; black_slots; white_slots } : t) ~ai (uses_ai : bool) : unit =
+    if Rules.check_done player black_slots white_slots then
+      game_done bd 0 0
+    else 
       Board.print_board bd;
       Printf.printf
         "Player %s, enter the row and column (e.g. '2 2')\n\
-         to place your piece (ctrl-d to quit): "
+        to place your piece (ctrl-d to quit): "
         (Go_players.to_string player);
       Out_channel.(flush stdout);
-      match In_channel.(input_line stdin) with
-      | None -> game_done bd 0 0
-      | Some input -> (
-          match String.split_on_chars input ~on:[ ' ' ] with
-          | [ s1; s2 ] -> (
-              match (int_of_string_opt s1, int_of_string_opt s2) with
-              | Some row, Some col ->
-                  let coord = (row - 1, col - 1) in
-                  if Rules.check_coords bd coord then
-                    let new_board = Board.update_board bd coord player in
-                    let occupied_board, pieces = take_pieces player new_board in
-                    if Rules.check_move occupied_board player coord then
-                      let new_board =
-                        update_game occupied_board player black_slots
-                          white_slots pieces
-                      in
-                      if uses_ai then
-                        run_console (play_ai new_board ~ai) ~ai uses_ai
-                      else run_console new_board ~ai uses_ai
-                    else (
-                      print_string "The position will make your piece(s) dead\n";
-                      run_console
-                        { bd; player; black_slots; white_slots }
-                        ~ai uses_ai)
-                  else
-                    run_console
-                      { bd; player; black_slots; white_slots }
-                      ~ai uses_ai
-              | _ ->
-                  print_string "Invalid input.\n";
-                  run_console
-                    { bd; player; black_slots; white_slots }
-                    ~ai uses_ai)
+      let coord =
+        if Go_players.is_black player then
+          conv_string_to_pair (ai bd player black_slots white_slots)
+        else 
+          try
+            match In_channel.(input_line stdin) with
+            | None -> -1, -1
+            | Some input ->
+              conv_string_to_pair input
+          with
           | _ ->
-              print_string
-                "Invalid input format. Please enter coordinates as 'row col'.\n";
-              run_console { bd; player; black_slots; white_slots } ~ai uses_ai))
+            print_string "Invalid input.\n";
+            -1, -1
+
+      in
+      if compare_tuples coord (-1, -1) then game_done bd 0 0
+      else (
+        if Rules.check_coords bd coord then
+          let new_board = Board.update_board bd coord player in
+          let occupied_board, pieces = Rules.take_pieces player new_board in
+          if Rules.check_move occupied_board player coord then
+            let new_board =
+              update_game occupied_board player black_slots white_slots pieces
+            in
+            run_console new_board ~ai uses_ai
+          else (
+            print_string "The position will make your piece(s) dead\n";
+            run_console
+              { bd; player; black_slots; white_slots }
+              ~ai uses_ai)
+        else (
+          run_console
+            { bd; player; black_slots; white_slots }
+            ~ai uses_ai))
 
   let run_two_player_console ({ bd; player; black_slots; white_slots } : t) :
       unit =
     run_console
       { bd; player; black_slots; white_slots }
-      ~ai:(fun _ _ _ _ -> { bd; player; black_slots; white_slots })
+      ~ai:(fun _ _ _ _ -> "")
       false
 
   let run_player_vs_ai_console ({ bd; player; black_slots; white_slots } : t)
       ~ai : unit =
-    run_console (play_ai { bd; player; black_slots; white_slots } ~ai) ~ai true
+    run_console { bd; player; black_slots; white_slots } ~ai true
 end

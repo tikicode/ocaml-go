@@ -163,7 +163,7 @@ let test_to_string _ =
 let test_init _ = 
   let game = Game_controller.init_game 3 Go_players.black 
   in assert_equal (Board.get_board(Game_controller.return_board game)) [(2, 2); (2, 1); (2, 0); (1, 2); (1, 1); (1, 0); (0, 2); (0, 1); (0, 0)];
-  assert_equal (Game_controller.return_player game) "Black";
+  assert_equal (Game_controller.return_player_name game) "Black";
   assert_equal (Game_controller.return_black_slots game) 9;
   assert_equal (Game_controller.return_white_slots game) 9
 
@@ -189,7 +189,7 @@ let test_is_alive _ =
   assert_equal dead_pieces [(1,1)]
 
 let test_take_pieces _ = 
-  let (new_board, dead_len) = (Game_controller.take_pieces Go_players.black updated_board) in 
+  let (new_board, dead_len) = (Rules.take_pieces Go_players.black updated_board) in 
   assert_equal dead_len 1;
   assert_equal new_board picked_board
 
@@ -201,7 +201,7 @@ let test_scoring _ =
 
 let test_passturn _ = 
   let new_state = Game_controller.pass_turn (Game_controller.init_game 3 Go_players.black) in 
-  let new_player = Game_controller.return_player new_state in 
+  let new_player = Game_controller.return_player_name new_state in 
   let same_board = Game_controller.return_board new_state in
   assert_equal new_player "White";
   assert_equal same_board (Board.init_board 3)
@@ -229,16 +229,16 @@ let test_update_game _ =
 
 let test_run _ = 
   let mock_state = Game_controller.init_game 5 Go_players.black in
-  let removed_state = (Game_controller.run_two_player mock_state "1 1") in
-  let removed_state = (Game_controller.run_two_player removed_state "2 1") in
-  let removed_state = (Game_controller.run_two_player removed_state "4 4") in 
-  let removed_state = (Game_controller.run_two_player removed_state "1 2") in
+  let removed_state = (Game_controller.run mock_state "1 1") in
+  let removed_state = (Game_controller.run removed_state "2 1") in
+  let removed_state = (Game_controller.run removed_state "4 4") in 
+  let removed_state = (Game_controller.run removed_state "1 2") in
   let init_board = Board.init_board 5 in
   let updated_board = Board.update_board init_board (0, 0) Go_players.whitehold in
   let updated_board = Board.update_board updated_board (0, 1) Go_players.white in
   let updated_board = Board.update_board updated_board (1, 0) Go_players.white in
   let updated_board = Board.update_board updated_board (3, 3) Go_players.black in
-  assert_equal (Game_controller.return_player removed_state) "Black";
+  assert_equal (Game_controller.return_player_name removed_state) "Black";
   assert_equal (Game_controller.return_white_slots removed_state) 22;
   assert_equal (Game_controller.return_white_slots removed_state) 22;
   assert_equal (Game_controller.return_board removed_state) updated_board
@@ -263,10 +263,13 @@ let test_random_player _ =
   let updated_board1 = Board.update_board test_board (0, 0) Go_players.white in
   let updated_board2 = Board.update_board updated_board1 (0, 1) Go_players.black in
   let updated_board3 = Board.update_board updated_board2 (1, 0) Go_players.white in
-  let random_move = random_player updated_board3 Go_players.black 1 2 in
-  let random_move2 = random_player (Game_controller.return_board random_move) Go_players.white 0 2 in
-  assert_equal (Game_controller.return_black_slots random_move) @@ 2;
-  assert_equal (Game_controller.return_white_slots random_move2) @@ 1
+  let random_move = random_player updated_board3 Go_players.black 1 2 in 
+  let updated_board4 = Board.update_board updated_board3 (1, 1) Go_players.black in
+  let updated_board5, _ = Rules.take_pieces Go_players.black updated_board4 in
+  let updated_board6 = Board.update_board updated_board5 (1, 0) Go_players.white in
+  let random_move2 = random_player updated_board6 Go_players.white 2 1 in
+  assert_equal random_move @@ "2 2"; (* String coordinates *)
+  assert_equal random_move2 @@ "1 1"
 
 let suite =
   "Go Test Suite" >:::
