@@ -44,37 +44,46 @@ let rec random_player (bd : Board.t) (player : Go_players.t) (black_slots : int)
     else random_player bd player black_slots white_slots
 
 (* module MCTS = struct
-     type t = {
-       bd : Board.t;
-       player : Go_players.t;
-       black_slots : int;
-       white_slots : int;
-       move : int * int;
-       mutable visits : int;
-       mutable wins : int;
-       mutable children : t list;
-     }
+  type t = {
+    bd : Board.t;
+    player : Go_players.t;
+    black_slots : int;
+    white_slots : int;
+    move : (int * int);
+    mutable visits : int;
+    mutable wins : int;
+    mutable children : t list;
+  }
 
-     let rec random_move (bd : Board.t) (player : Go_players.t) : int * int =
-       let next_move =
-         (bd |> Board.get_size |> Random.int, bd |> Board.get_size |> Random.int)
-       in
-       let p = Board.get_player bd next_move in
-       if Go_players.is_blank p then
-         let new_board = Board.update_board bd next_move player in
-         let occupied_board, _ = Game_controller.take_pieces player new_board in
-         if Game_controller.check_move occupied_board player next_move then
-           next_move
-         else random_move bd player
-       else random_move bd player
+  let get_board (state : t) : Board.t = state.bd
+  let get_player (state : t) : Go_players.t = state.player
+  let get_black_slots (state : t) : int = state.black_slots
+  let get_white_slots (state : t) : int = state.white_slots
+  let get_move (state : t) : (int * int)= state.move
+  let get_visits (state : t) : int = state.visits
+  let get_wins (state : t) : int = state.wins
+  let get_children (state : t) : t list = state.children
 
-       let rec expand_node (cur_game : Board.t) (player : Go_players.t) (node : t) =
-         let move = random_move cur_game player in
-         let child_state = Board.update_board cur_game move player in
-         let child_node = { bd = child_state; player; black_slots = 0; white_slots = 0; move; visits = 0; wins = 0; children = [] } in
-         node.children <- child_node :: node.children;
-         simulate cur_game child_state;
-         backpropagate node (result cur_game child_state)
+  let rec random_move (bd : Board.t) (player : Go_players.t) : int * int =
+    let next_move =
+      (bd |> Board.get_size |> Random.int, bd |> Board.get_size |> Random.int)
+    in
+    let p = Board.get_player bd next_move in
+    if Go_players.is_blank p then
+      let new_board = Board.update_board bd next_move player in
+      let occupied_board, _ = Game_controller.take_pieces player new_board in
+      if Game_controller.check_move occupied_board player next_move then
+        next_move
+      else random_move bd player
+    else random_move bd player
+
+  let rec expand_node (node : t) =
+    let move = random_move cur_game player in
+    let child_state = Board.update_board cur_game move player in
+    let child_node = { bd = child_state; player; black_slots = 0; white_slots = 0; move; visits = 0; wins = 0; children = [] } in
+    node.children <- child_node :: node.children;
+    simulate cur_game child_state;
+    backpropagate node (result cur_game child_state)
 
      and simulate initial_state state =
        (* pseudo for game state*)
@@ -156,7 +165,7 @@ let rec random_player (bd : Board.t) (player : Go_players.t) (black_slots : int)
        (* let initial_state = { board = create_board size; player_turn = Black } in
        let best_move = mcts initial_state iterations in
        Printf.printf "Best Move: (%d, %d)\n" (fst best_move + 1) (snd best_move + 1) *)
-   end *)
+   end 
 
 (* ideas for impl
    * when running expand, only expand n number of moves (keep it constant, say 250)
@@ -173,5 +182,4 @@ let rec random_player (bd : Board.t) (player : Go_players.t) (black_slots : int)
    * compatibility with both local CL variants and posted variants of the game?
    perhaps we change ai function to only return a move rather than the entire
    game state
-   * bing bong i am sleepy
-*)
+   * bing bong i am sleepy *) *)

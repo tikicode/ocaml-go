@@ -56,9 +56,9 @@ module Game_controller = struct
      this earlier lmao
   *)
 
-  let conv_string_to_pair_list move =
+  let conv_string_to_pair move =
     match String.split move ~on:' ' with
-    | [ row; col ] -> [ (int_of_string row - 1, int_of_string col - 1) ]
+    | [ row; col ] -> (int_of_string row - 1, int_of_string col - 1)
     | _ -> failwith "Incorrect input"
 
   let update_game (bd : Board.t) (player : Go_players.t) (black_slots : int)
