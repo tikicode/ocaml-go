@@ -1,6 +1,6 @@
-open Core
 open Players
 open Board
+open Rules
 
 module Game_controller = struct
   type t = {
@@ -22,27 +22,14 @@ module Game_controller = struct
   let return_white_slots { white_slots; _ } : int = white_slots
 
   let game_done (bd : Board.t) (white_handi : int) (black_handi : int) : unit =
-    let black_score =
-      Board.count bd ~f:(Go_players.is_consistent Go_players.black)
-      + black_handi
-    in
-    let white_score =
-      Board.count bd ~f:(Go_players.is_consistent Go_players.white)
-      + 6 + white_handi
-      (* change to use game_done white or black *)
-    in
+    let black_score = game_done_black_score bd + black_handi in
+    let white_score = game_done_white_score bd + white_handi in
     Printf.printf "\nThe score of player Black is: %d\n" black_score;
     Printf.printf "The score of player White is: %d\n" white_score;
 
     if black_score > white_score then Printf.printf "Player Black wins!\n"
     else if black_score < white_score then Printf.printf "Player White wins!\n"
     else Printf.printf "It's a tie!\n"
-
-  let game_done_white_score (bd : Board.t) : int =
-    Board.count bd ~f:(Go_players.is_consistent Go_players.white) + 6
-
-  let game_done_black_score (bd : Board.t) : int =
-    Board.count bd ~f:(Go_players.is_consistent Go_players.black)
 
   let return_board { bd; _ } : Board.t = bd
   let return_player { player; _ } : string = Go_players.to_string player
@@ -51,26 +38,11 @@ module Game_controller = struct
     let new_player = Go_players.opposite player in
     { bd; player = new_player; black_slots; white_slots }
 
-  let check_done (player : Go_players.t) (black_slots : int) (white_slots : int)
-      : bool =
-    if Go_players.is_white player then white_slots <= 0 else black_slots <= 0
-
-  let check_coords (board : Board.t) (coord : int * int) : bool =
-    if not (Board.valid_coordinate board coord) then (
-      print_string "Invalid coordinitate.\n";
-      false)
-    else
-      let p = Board.get_player board coord in
-      if Go_players.is_blank p then true
-      else (
-        print_string "The position has already been occupied.\n";
-        false)
-
   let rec next_move_ai { bd; player; black_slots; white_slots } : string =
     let random_coordinate =
       (Random.int (Board.get_size bd), Random.int (Board.get_size bd))
     in
-    if not (check_coords bd random_coordinate) then
+    if not (Rules.check_coords bd random_coordinate) then
       next_move_ai { bd; player; black_slots; white_slots }
     else
       match random_coordinate with
@@ -112,38 +84,6 @@ module Game_controller = struct
         black_slots = black_slots + pieces - 1;
         white_slots = white_slots + pieces - 2;
       }
-
-  let rec dfs (board : Board.t) (player : Go_players.t)
-      (visited : (int * int, 'a) Set.t) (stack : (int * int) list) : bool =
-    match stack with
-    | [] -> false
-    | coord :: st when Set.mem visited coord -> dfs board player visited st
-    | coord :: st ->
-        let p = Board.get_player board coord in
-        if Go_players.is_blank p then true
-        else if not (Go_players.is_same player p) then
-          dfs board player visited st
-        else
-          let neighbours = Board.get_neighbours board coord in
-          let unvisited =
-            List.filter neighbours ~f:(fun c -> not (Set.mem visited c))
-          in
-          dfs board player (Set.add visited coord) (unvisited @ st)
-
-  let is_alive (bd : Board.t) (player : Go_players.t) (coord : int * int) : bool
-      =
-    let p = Board.get_player bd coord in
-    if Go_players.is_blank p then true
-    else if Go_players.is_same player p then true
-    else
-      let set = Set.empty (module Tuple.Comparator (Int) (Int)) in
-      dfs bd p set [ coord ]
-
-  let check_move (bd : Board.t) (player : Go_players.t) (coord : int * int) :
-      bool =
-    is_alive bd (Go_players.opposite player) coord
-
-  let get_white_slots { white_slots; _ } = white_slots
 
   let take_pieces (player : Go_players.t) (bd : Board.t) : Board.t * int =
     let coords = Board.get_board bd in

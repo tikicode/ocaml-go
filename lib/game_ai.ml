@@ -157,21 +157,20 @@ let rec random_player (bd : Board.t) (player : Go_players.t) (black_slots : int)
        Printf.printf "Best Move: (%d, %d)\n" (fst best_move + 1) (snd best_move + 1) *)
    end *)
 
-
-   (* ideas for impl
-      * when running expand, only expand n number of moves (keep it constant, say 250)
-        or expand until the game ends 
-      * at the end of the search, return a tuple of the necessary move and of the root 
-      of the tree (at this point, the human player's last move) so we can use it to expand
-      the next set and retain any memory we may have 
-      * at each step, try to explore every child of the root at least once 
-      * determine best move with uct from child 
-      * if equivalents, randomly select
-      * see if we can train on some games already played first
-      * Figure out async, can we just wait until the games are played out? Will take 
-      longer at the start of the game and shorter at the end 
-      * compatibility with both local CL variants and posted variants of the game?
-      perhaps we change ai function to only return a move rather than the entire
-      game state
-      * bing bong i am sleepy
-   *)
+(* ideas for impl
+   * when running expand, only expand n number of moves (keep it constant, say 250)
+     or expand until the game ends
+   * at the end of the search, return a tuple of the necessary move and of the root
+   of the tree (at this point, the human player's last move) so we can use it to expand
+   the next set and retain any memory we may have
+   * at each step, try to explore every child of the root at least once
+   * determine best move with uct from child
+   * if equivalents, randomly select
+   * see if we can train on some games already played first
+   * Figure out async, can we just wait until the games are played out? Will take
+   longer at the start of the game and shorter at the end
+   * compatibility with both local CL variants and posted variants of the game?
+   perhaps we change ai function to only return a move rather than the entire
+   game state
+   * bing bong i am sleepy
+*)

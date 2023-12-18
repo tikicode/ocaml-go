@@ -2,8 +2,7 @@ open Core
 open Players
 open Board
 
-
-module Rules = struct 
+module Rules = struct
   let game_done_white_score (bd : Board.t) : int =
     Board.count bd ~f:(Go_players.is_consistent Go_players.white) + 6
 
@@ -11,7 +10,49 @@ module Rules = struct
     Board.count bd ~f:(Go_players.is_consistent Go_players.black)
 
   let check_done (player : Go_players.t) (black_slots : int) (white_slots : int)
-    : bool =
+      : bool =
     if Go_players.is_white player then white_slots <= 0 else black_slots <= 0
 
-  
+  let rec dfs (board : Board.t) (player : Go_players.t)
+      (visited : (int * int, 'a) Set.t) (stack : (int * int) list) : bool =
+    match stack with
+    | [] -> false
+    | coord :: st when Set.mem visited coord -> dfs board player visited st
+    | coord :: st ->
+        let p = Board.get_player board coord in
+        if Go_players.is_blank p then true
+        else if not (Go_players.is_same player p) then
+          dfs board player visited st
+        else
+          let neighbours = Board.get_neighbours board coord in
+          let unvisited =
+            List.filter neighbours ~f:(fun c -> not (Set.mem visited c))
+          in
+          dfs board player (Set.add visited coord) (unvisited @ st)
+
+  let is_alive (bd : Board.t) (player : Go_players.t) (coord : int * int) : bool
+      =
+    let p = Board.get_player bd coord in
+    if Go_players.is_blank p then true
+    else if Go_players.is_same player p then true
+    else
+      let set = Set.empty (module Tuple.Comparator (Int) (Int)) in
+      dfs bd p set [ coord ]
+
+  let check_move (bd : Board.t) (player : Go_players.t) (coord : int * int) :
+      bool =
+    is_alive bd (Go_players.opposite player) coord
+
+  let check_coords (board : Board.t) (coord : int * int) : bool =
+    if not (Board.valid_coordinate board coord) then (
+      print_string "Invalid coordinitate.\n";
+      false)
+    else
+      let p = Board.get_player board coord in
+      if Go_players.is_blank p then true
+      else (
+        print_string "The position has already been occupied.\n";
+        false)
+
+  (* remove duplicated valid functionality in is_alive etc. *)
+end

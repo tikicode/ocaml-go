@@ -1,8 +1,4 @@
 (library
  (name go)
- (modules players board game_controller game_ai)
+ (modules players board game_controller game_ai rules)
  (libraries core))
-
-;(env
-;  (dev
-;    (flags (:standard -warn-error -A))))
