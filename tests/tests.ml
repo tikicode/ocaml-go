@@ -4,6 +4,7 @@ open Board
 open Players
 open Game_controller
 open Game_ai
+open Rules
 
 let test_init_board _ =
   let bd = Board.return_list (Board.init_board 3) in
@@ -168,7 +169,7 @@ let test_init _ =
 
 let test_check_board _ = 
   let test_board = Board.init_board 3 in 
-  assert_equal (Game_controller.check_coords test_board (19,19)) false
+  assert_equal (Rules.check_coords test_board (19,19)) @@ false
 
 let init_board = Board.init_board 5 
 let updated_board = Board.update_board init_board (1, 1) Go_players.white 
@@ -193,8 +194,8 @@ let test_take_pieces _ =
   assert_equal new_board picked_board
 
 let test_scoring _ = 
-  let white_score = Game_controller.game_done_white_score picked_board in 
-  let black_score = Game_controller.game_done_black_score picked_board in 
+  let white_score = Rules.game_done_white_score picked_board in 
+  let black_score = Rules.game_done_black_score picked_board in 
   assert_equal white_score 6;
   assert_equal black_score 5
 
@@ -205,17 +206,17 @@ let test_passturn _ =
   assert_equal new_player "White";
   assert_equal same_board (Board.init_board 3)
 
-let test_conv_string_to_pair_list _ = 
-  let new_list = Game_controller.conv_string_to_pair_list ("12 12") in 
-  assert_equal new_list [(11,11)]
+let test_conv_string_to_pair _ = 
+  let new_coord = Game_controller.conv_string_to_pair ("12 12") in 
+  assert_equal new_coord (11,11)
 
 let test_check_done _ = 
-  assert_equal (Game_controller.check_done Go_players.white 10 10) false;
-  assert_equal (Game_controller.check_done Go_players.white 0 10) false;
-  assert_equal (Game_controller.check_done Go_players.black 10 10) false;
-  assert_equal (Game_controller.check_done Go_players.black 10 0) false;
-  assert_equal (Game_controller.check_done Go_players.black 0 0) true;
-  assert_equal (Game_controller.check_done Go_players.white 0 0) true
+  assert_equal (Rules.check_done Go_players.white 10 10) false;
+  assert_equal (Rules.check_done Go_players.white 0 10) false;
+  assert_equal (Rules.check_done Go_players.black 10 10) false;
+  assert_equal (Rules.check_done Go_players.black 10 0) false;
+  assert_equal (Rules.check_done Go_players.black 0 0) true;
+  assert_equal (Rules.check_done Go_players.white 0 0) true
 
 let test_update_game _ = 
   let new_game = Game_controller.update_game updated_board Go_players.white 5 5 2 in 
@@ -300,7 +301,7 @@ let suite =
       "check scoring" >:: test_scoring;
       "check pass turn" >:: test_passturn;
       "check done" >:: test_check_done;
-      "test_conv_string_to_pair_list" >:: test_conv_string_to_pair_list;
+      "test_conv_string_to_pair" >:: test_conv_string_to_pair;
       "test_update_game" >:: test_update_game;
       "test_run" >:: test_run;
     ];
