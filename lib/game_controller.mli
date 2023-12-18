@@ -1,6 +1,5 @@
 open Players
 open Board
-open Core
 
 module Game_controller : sig
   type t
@@ -19,6 +18,7 @@ module Game_controller : sig
   val return_dead : Go_players.t -> Board.t -> (int * int) list
   val play_ai : t -> ai:(Board.t -> Go_players.t -> int -> int -> t) -> t
   val pass_turn : t -> t
+  val get_white_slots : t -> int
 
   val run :
     t -> ai:(Board.t -> Go_players.t -> int -> int -> t) -> bool -> string -> t

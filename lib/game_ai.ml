@@ -2,6 +2,7 @@ open Core
 open Game_controller
 open Board
 open Players
+open Rules
 
 let open_center_positions (bd : Board.t) : (int * int) list =
   let n = Board.get_size bd in
@@ -36,7 +37,7 @@ let rec random_player (bd : Board.t) (player : Go_players.t) (black_slots : int)
       let occupied_board, pieces =
         Game_controller.take_pieces player new_board
       in
-      if Game_controller.check_move occupied_board player next_move then
+      if Rules.check_move occupied_board player next_move then
         Game_controller.update_game occupied_board player black_slots
           white_slots pieces
       else random_player bd player black_slots white_slots

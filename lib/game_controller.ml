@@ -1,6 +1,7 @@
 open Players
 open Board
 open Rules
+open Core
 
 module Game_controller = struct
   type t = {
@@ -22,8 +23,8 @@ module Game_controller = struct
   let return_white_slots { white_slots; _ } : int = white_slots
 
   let game_done (bd : Board.t) (white_handi : int) (black_handi : int) : unit =
-    let black_score = game_done_black_score bd + black_handi in
-    let white_score = game_done_white_score bd + white_handi in
+    let black_score = Rules.game_done_black_score bd + black_handi in
+    let white_score = Rules.game_done_white_score bd + white_handi in
     Printf.printf "\nThe score of player Black is: %d\n" black_score;
     Printf.printf "The score of player White is: %d\n" white_score;
 
@@ -89,7 +90,7 @@ module Game_controller = struct
     let coords = Board.get_board bd in
     let holden = Go_players.hold player in
     let deads =
-      List.filter coords ~f:(fun coord -> not (is_alive bd player coord))
+      List.filter coords ~f:(fun coord -> not (Rules.is_alive bd player coord))
     in
     let new_board =
       List.fold deads ~init:bd ~f:(fun bd coord ->
@@ -99,7 +100,7 @@ module Game_controller = struct
 
   let return_dead (player : Go_players.t) (bd : Board.t) : (int * int) list =
     let coords = Board.get_board bd in
-    List.filter coords ~f:(fun coord -> not (is_alive bd player coord))
+    List.filter coords ~f:(fun coord -> not (Rules.is_alive bd player coord))
 
   let play_ai ({ bd; player; black_slots; white_slots } : t) ~ai : t =
     ai bd player black_slots white_slots
@@ -110,12 +111,14 @@ module Game_controller = struct
         match (int_of_string_opt s1, int_of_string_opt s2) with
         | Some row, Some col ->
             let coord = (row - 1, col - 1) in
-            if check_coords bd coord then
+            if Rules.check_coords bd coord then
               let new_board = Board.update_board bd coord player in
               return_dead player new_board
             else [ (21, 21) ]
         | _ -> [ (22, 22) ])
     | _ -> [ (23, 23) ]
+
+  let get_white_slots { white_slots; _ } = white_slots
 
   let run ({ bd; player; black_slots; white_slots } : t) ~ai (uses_ai : bool)
       (input : string) : t =
@@ -124,10 +127,10 @@ module Game_controller = struct
         match (int_of_string_opt s1, int_of_string_opt s2) with
         | Some row, Some col ->
             let coord = (row - 1, col - 1) in
-            if check_coords bd coord then
+            if Rules.check_coords bd coord then
               let new_board = Board.update_board bd coord player in
               let occupied_board, pieces = take_pieces player new_board in
-              if check_move occupied_board player coord then
+              if Rules.check_move occupied_board player coord then
                 let updated =
                   update_game occupied_board player black_slots white_slots
                     pieces
@@ -154,7 +157,7 @@ module Game_controller = struct
 
   let rec run_console ({ bd; player; black_slots; white_slots } : t) ~ai
       (uses_ai : bool) : unit =
-    if check_done player black_slots white_slots then game_done bd 0 0
+    if Rules.check_done player black_slots white_slots then game_done bd 0 0
     else (
       Board.print_board bd;
       Printf.printf
@@ -170,10 +173,10 @@ module Game_controller = struct
               match (int_of_string_opt s1, int_of_string_opt s2) with
               | Some row, Some col ->
                   let coord = (row - 1, col - 1) in
-                  if check_coords bd coord then
+                  if Rules.check_coords bd coord then
                     let new_board = Board.update_board bd coord player in
                     let occupied_board, pieces = take_pieces player new_board in
-                    if check_move occupied_board player coord then
+                    if Rules.check_move occupied_board player coord then
                       let new_board =
                         update_game occupied_board player black_slots
                           white_slots pieces

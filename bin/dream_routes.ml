@@ -4,6 +4,7 @@
 
 open Go
 open Players
+open Rules
 open Game_controller
 
 type data = int * int [@@deriving yojson]
@@ -67,8 +68,8 @@ let score_handler _ =
     ]
   in
   let final_board = Game_controller.return_board game_state.game in
-  let white_score = Game_controller.game_done_white_score final_board in
-  let black_score = Game_controller.game_done_black_score final_board in
+  let white_score = Rules.game_done_white_score final_board in
+  let black_score = Rules.game_done_black_score final_board in
   Dream.json ~headers
     (Yojson.Safe.to_string (data_to_yojson (white_score, black_score)))
 
