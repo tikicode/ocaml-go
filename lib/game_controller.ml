@@ -33,22 +33,20 @@ module Game_controller = struct
     else Printf.printf "It's a tie!\n"
 
   let return_board { bd; _ } : Board.t = bd
-  let return_player_name { player; _ } : string = Go_players.to_string player
-
-  let return_player {player; _} : Go_players.t = player
+  let return_player_name { player; _ } : string = player |> Go_players.to_string
+  let return_player { player; _ } : Go_players.t = player
 
   let pass_turn { bd; player; black_slots; white_slots } : t =
-    let new_player = Go_players.opposite player in
-    { bd; player = new_player; black_slots; white_slots }
+    { bd; player = player |> Go_players.opposite; black_slots; white_slots }
 
-  let conv_string_to_pair move =
+  let conv_string_to_pair (move : string) : int * int =
     match String.split move ~on:' ' with
     | [ row; col ] -> (int_of_string row - 1, int_of_string col - 1)
     | _ -> failwith "Incorrect input"
 
   let update_game (bd : Board.t) (player : Go_players.t) (black_slots : int)
       (white_slots : int) (pieces : int) : t =
-    let new_player = Go_players.opposite player in
+    let new_player = player |> Go_players.opposite in
     if pieces = 0 then
       {
         bd;
@@ -72,11 +70,8 @@ module Game_controller = struct
       }
 
   let return_dead (player : Go_players.t) (bd : Board.t) : (int * int) list =
-    let coords = Board.get_board bd in
+    let coords = bd |> Board.get_board in
     List.filter coords ~f:(fun coord -> not (Rules.is_alive bd player coord))
-
-  let play_ai ({ bd; player; black_slots; white_slots } : t) ~ai : t =
-    ai bd player black_slots white_slots
 
   let get_dead_pieces { bd; player; _ } (inputs : string) : (int * int) list =
     match String.split_on_chars inputs ~on:[ ' ' ] with
@@ -93,8 +88,7 @@ module Game_controller = struct
 
   let get_white_slots { white_slots; _ } = white_slots
 
-  let run ({ bd; player; black_slots; white_slots } : t)
-      (input : string) : t =
+  let run ({ bd; player; black_slots; white_slots } : t) (input : string) : t =
     match String.split_on_chars input ~on:[ ' ' ] with
     | [ s1; s2 ] -> (
         match (int_of_string_opt s1, int_of_string_opt s2) with
@@ -104,66 +98,54 @@ module Game_controller = struct
               let new_board = Board.update_board bd coord player in
               let occupied_board, pieces = Rules.take_pieces player new_board in
               if Rules.check_move occupied_board player coord then
-                  update_game occupied_board player black_slots white_slots
-                    pieces
+                update_game occupied_board player black_slots white_slots pieces
               else init_game 1 Go_players.black
             else init_game 1 Go_players.black
         | _ -> init_game 1 Go_players.black)
     | _ -> init_game 1 Go_players.black
 
-  let compare_tuples (x1, y1: (int * int)) (x2, y2 : (int * int)) : bool = 
+  let compare_tuples ((x1, y1) : int * int) ((x2, y2) : int * int) : bool =
     if x1 = x2 && y1 = y2 then true else false
 
-  let rec run_console ({ bd; player; black_slots; white_slots } : t) ~ai (uses_ai : bool) : unit =
-    if Rules.check_done player black_slots white_slots then
-      game_done bd 0 0
-    else 
-      Board.print_board bd;
-      Printf.printf
-        "Player %s, enter the row and column (e.g. '2 2')\n\
-        to place your piece (ctrl-d to quit): "
-        (Go_players.to_string player);
-      Out_channel.(flush stdout);
-      let coord =
-        if Go_players.is_black player then
-          conv_string_to_pair (ai bd player black_slots white_slots)
-        else 
-          try
-            match In_channel.(input_line stdin) with
-            | None -> -1, -1
-            | Some input ->
-              conv_string_to_pair input
-          with
-          | _ ->
-            print_string "Invalid input.\n";
-            -1, -1
-
-      in
-      if compare_tuples coord (-1, -1) then game_done bd 0 0
+  let rec run_console ({ bd; player; black_slots; white_slots } : t) ~ai
+      (uses_ai : bool) : unit =
+    if Rules.check_done player black_slots white_slots then game_done bd 0 0
+    else bd |> Board.print_board;
+    Printf.printf
+      "Player %s, enter the row and column (e.g. '2 2')\n\
+       to place your piece (ctrl-d to quit): "
+      (Go_players.to_string player);
+    Out_channel.(flush stdout);
+    let coord =
+      if Go_players.is_black player && uses_ai then conv_string_to_pair (ai bd player)
+      else
+        try
+          match In_channel.(input_line stdin) with
+          | None -> (-1, -1)
+          | Some input -> input |> conv_string_to_pair
+        with _ ->
+          print_string "Invalid input.\n";
+          (-1, -1)
+    in
+    if compare_tuples coord (-1, -1) then game_done bd 0 0
+    else if Rules.check_coords bd coord then
+      let new_board = Board.update_board bd coord player in
+      let occupied_board, pieces = Rules.take_pieces player new_board in
+      if Rules.check_move occupied_board player coord then
+        let new_board =
+          update_game occupied_board player black_slots white_slots pieces
+        in
+        run_console new_board ~ai uses_ai
       else (
-        if Rules.check_coords bd coord then
-          let new_board = Board.update_board bd coord player in
-          let occupied_board, pieces = Rules.take_pieces player new_board in
-          if Rules.check_move occupied_board player coord then
-            let new_board =
-              update_game occupied_board player black_slots white_slots pieces
-            in
-            run_console new_board ~ai uses_ai
-          else (
-            print_string "The position will make your piece(s) dead\n";
-            run_console
-              { bd; player; black_slots; white_slots }
-              ~ai uses_ai)
-        else (
-          run_console
-            { bd; player; black_slots; white_slots }
-            ~ai uses_ai))
+        print_string "The position will make your piece(s) dead\n";
+        run_console { bd; player; black_slots; white_slots } ~ai uses_ai)
+    else run_console { bd; player; black_slots; white_slots } ~ai uses_ai
 
   let run_two_player_console ({ bd; player; black_slots; white_slots } : t) :
       unit =
     run_console
       { bd; player; black_slots; white_slots }
-      ~ai:(fun _ _ _ _ -> "")
+      ~ai:(fun _ _ -> "")
       false
 
   let run_player_vs_ai_console ({ bd; player; black_slots; white_slots } : t)

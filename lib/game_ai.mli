@@ -1,27 +1,22 @@
 open Board
 open Players
 
-(* module MCTS : sig
-     type t = {
-       move: (int * int) option;
-       mutable visits: int;
-       mutable wins: int;
-       mutable children: t list;
-     }
-     (* game_state needs to be converted to node game type  TODO *)
-     val random_move : Board.t -> Go_players.t -> int -> int -> int * int
-     val expand_node : Board.t -> Go_players.t -> int -> int  -> t -> unit
-     val simulate : game_state -> game_state -> int
-     val backpropagate : t -> int -> unit
-     val result : game_state -> game_state -> int
-     val has_winner : game_state -> bool
-     val is_board_full : game_state -> bool
-     val mcts : game_state -> int -> move
-     val select_node : game_state -> t -> t
-     val uct_best_child : t -> t
-     val select_best_move : t -> t
-     val play_game : int -> int -> unit
-   end *)
+module MCTS : sig
+  type t
+
+  val init_state : int -> t
+  val update_slots : Go_players.t -> int -> int -> int -> int * int
+
+  val random_move :
+    Board.t -> Go_players.t -> int -> int -> Board.t * (int * int) * int * int
+
+  val result : t -> int
+  val backpropagate : t list -> int -> t -> t
+  val expand_node : t -> t
+  val select_child : t -> t option
+  val tree_policy : t -> t
+  val monte_carlo_tree_search : t -> int -> t * (int * int)
+end
 
 val open_center_positions : Board.t -> (int * int) list
-val random_player : Board.t -> Go_players.t -> int -> int -> string
+val random_player : Board.t -> Go_players.t -> string

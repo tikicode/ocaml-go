@@ -15,16 +15,12 @@ module Game_controller : sig
   val return_player : t -> Go_players.t
   val return_player_name : t -> string
   val return_dead : Go_players.t -> Board.t -> (int * int) list
-  val play_ai : t -> ai:(Board.t -> Go_players.t -> int -> int -> t) -> t
   val pass_turn : t -> t
   val get_white_slots : t -> int
   val run : t -> string -> t
-
-  val run_console :
-    t -> ai:(Board.t -> Go_players.t -> int -> int -> string) -> bool -> unit
-
+  val run_console : t -> ai:(Board.t -> Go_players.t -> string) -> bool -> unit
   val run_two_player_console : t -> unit
 
   val run_player_vs_ai_console :
-    t -> ai:(Board.t -> Go_players.t -> int -> int -> string) -> unit
+    t -> ai:(Board.t -> Go_players.t -> string) -> unit
 end

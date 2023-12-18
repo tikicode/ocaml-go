@@ -11,7 +11,7 @@ module Rules = struct
 
   let check_done (player : Go_players.t) (black_slots : int) (white_slots : int)
       : bool =
-    if Go_players.is_white player then white_slots <= 0 else black_slots <= 0
+    if player |> Go_players.is_white then white_slots <= 0 else black_slots <= 0
 
   let rec dfs (board : Board.t) (player : Go_players.t)
       (visited : (int * int, 'a) Set.t) (stack : (int * int) list) : bool =
@@ -20,7 +20,7 @@ module Rules = struct
     | coord :: st when Set.mem visited coord -> dfs board player visited st
     | coord :: st ->
         let p = Board.get_player board coord in
-        if Go_players.is_blank p then true
+        if p |> Go_players.is_blank then true
         else if not (Go_players.is_same player p) then
           dfs board player visited st
         else
@@ -33,7 +33,7 @@ module Rules = struct
   let is_alive (bd : Board.t) (player : Go_players.t) (coord : int * int) : bool
       =
     let p = Board.get_player bd coord in
-    if Go_players.is_blank p then true
+    if p  |> Go_players.is_blank then true
     else if Go_players.is_same player p then true
     else
       let set = Set.empty (module Tuple.Comparator (Int) (Int)) in

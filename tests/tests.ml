@@ -263,11 +263,11 @@ let test_random_player _ =
   let updated_board1 = Board.update_board test_board (0, 0) Go_players.white in
   let updated_board2 = Board.update_board updated_board1 (0, 1) Go_players.black in
   let updated_board3 = Board.update_board updated_board2 (1, 0) Go_players.white in
-  let random_move = random_player updated_board3 Go_players.black 1 2 in 
+  let random_move = random_player updated_board3 Go_players.black in 
   let updated_board4 = Board.update_board updated_board3 (1, 1) Go_players.black in
   let updated_board5, _ = Rules.take_pieces Go_players.black updated_board4 in
   let updated_board6 = Board.update_board updated_board5 (1, 0) Go_players.white in
-  let random_move2 = random_player updated_board6 Go_players.white 2 1 in
+  let random_move2 = random_player updated_board6 Go_players.white in
   assert_equal random_move @@ "2 2"; (* String coordinates *)
   assert_equal random_move2 @@ "1 1"
 
