@@ -208,8 +208,12 @@ let test_passturn _ =
 
 let test_conv_string_to_pair _ = 
   let new_coord = Game_controller.conv_string_to_pair ("12 12") in 
-  assert_equal new_coord (11,11)
+  assert_equal new_coord (11,11);
 
+  assert_raises (Failure "Incorrect input") (fun () ->
+      let _ = Game_controller.conv_string_to_pair "invalid" in
+      ()
+    )
 let test_check_done _ = 
   assert_equal (Rules.check_done Go_players.white 10 10) false;
   assert_equal (Rules.check_done Go_players.white 0 10) false;
@@ -221,11 +225,30 @@ let test_check_done _ =
 let test_update_game _ = 
   let new_game = Game_controller.update_game updated_board Go_players.white 5 5 2 in 
   let new_game2 = Game_controller.update_game updated_board Go_players.black 5 5 0 in 
+  let new_game3 = Game_controller.update_game updated_board Go_players.black 5 5 2 in 
   assert_equal (Game_controller.return_white_slots new_game) 6;
   assert_equal (Game_controller.return_black_slots new_game) 5;
   assert_equal (Game_controller.return_white_slots new_game2) 4;
-  assert_equal (Game_controller.return_black_slots new_game2) 4
+  assert_equal (Game_controller.return_black_slots new_game2) 4;
+  assert_equal (Game_controller.return_black_slots new_game3) 6;
+  assert_equal (Game_controller.return_white_slots new_game3) 5
 
+let test_get_dead_pieces _ = 
+  let mock_state = Game_controller.init_game 19 Go_players.black in
+  let removed_state = (Game_controller.run mock_state "2 2") in
+  let removed_state = (Game_controller.run removed_state "1 2") in
+  let removed_state = (Game_controller.run removed_state "10 10") in
+  let removed_state = (Game_controller.run removed_state "2 1") in
+  let removed_state = (Game_controller.run removed_state "10 11") in
+  let removed_state = (Game_controller.run removed_state "2 3") in
+  let removed_state = (Game_controller.run removed_state "10 12") in
+  let res_list = Game_controller.get_dead_pieces removed_state "3 2" in 
+  assert_equal res_list [(1,1)];
+
+  assert_raises (Failure "Incorrect input") (fun () ->
+    let _ = Game_controller.get_dead_pieces removed_state "invalid" in
+    ()
+  )
 
 let test_run _ = 
   let mock_state = Game_controller.init_game 5 Go_players.black in
@@ -238,10 +261,18 @@ let test_run _ =
   let updated_board = Board.update_board updated_board (0, 1) Go_players.white in
   let updated_board = Board.update_board updated_board (1, 0) Go_players.white in
   let updated_board = Board.update_board updated_board (3, 3) Go_players.black in
+  let failed_state = (Game_controller.run mock_state "Failed") in
+  let failed_state2 = (Game_controller.run mock_state "t s") in
+  let failed_state3 = (Game_controller.run mock_state "999 999") in 
+  let failed_state4 = (Game_controller.run removed_state "1 2") in
   assert_equal (Game_controller.return_player_name removed_state) "Black";
   assert_equal (Game_controller.return_white_slots removed_state) 22;
   assert_equal (Game_controller.return_white_slots removed_state) 22;
-  assert_equal (Game_controller.return_board removed_state) updated_board
+  assert_equal (Game_controller.return_board removed_state) updated_board;
+  assert_equal (Game_controller.return_white_slots failed_state) 1;
+  assert_equal (Game_controller.return_white_slots failed_state2) 1;
+  assert_equal (Game_controller.return_white_slots failed_state3) 1;
+  assert_equal (Game_controller.return_white_slots failed_state4) 1
 
 
 let test_open_center_positions _ = 
@@ -270,6 +301,14 @@ let test_random_player _ =
   let random_move2 = random_player updated_board6 Go_players.white in
   assert_equal random_move @@ "2 2"; (* String coordinates *)
   assert_equal random_move2 @@ "1 1"
+
+let test_return_black_slots _ = 
+  let game = Game_controller.init_game 19 Go_players.black in 
+  assert_equal (Game_controller.return_black_slots game) 361
+
+let test_return_white_slots _ =
+  let game = Game_controller.init_game 19 Go_players.black in 
+  assert_equal (Game_controller.return_white_slots game) 361
 
 let suite =
   "Go Test Suite" >:::
@@ -307,6 +346,9 @@ let suite =
       "test_conv_string_to_pair" >:: test_conv_string_to_pair;
       "test_update_game" >:: test_update_game;
       "test_run" >:: test_run;
+      "test_return_black" >:: test_return_black_slots;
+      "test_return_white" >:: test_return_white_slots;
+      "test_dead_pieces" >:: test_get_dead_pieces;
     ];
     "Game AI Test Suite" >::: [
       "open_center_positions" >:: test_open_center_positions;

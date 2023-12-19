@@ -82,11 +82,9 @@ module Game_controller = struct
             if Rules.check_coords bd coord then
               let new_board = Board.update_board bd coord player in
               return_dead player new_board
-            else [ (21, 21) ]
-        | _ -> [ (22, 22) ])
-    | _ -> [ (23, 23) ]
-
-  let get_white_slots { white_slots; _ } = white_slots
+            else failwith "Incorrect input"
+        | _ -> failwith "Incorrect input")
+    | _ -> failwith "Incorrect input"
 
   let run ({ bd; player; black_slots; white_slots } : t) (input : string) : t =
     match String.split_on_chars input ~on:[ ' ' ] with
@@ -107,6 +105,7 @@ module Game_controller = struct
   let compare_tuples ((x1, y1) : int * int) ((x2, y2) : int * int) : bool =
     if x1 = x2 && y1 = y2 then true else false
 
+  [@@@coverage off]
   let rec run_console ({ bd; player; black_slots; white_slots } : t) ~ai
       (uses_ai : bool) : unit =
     if Rules.check_done player black_slots white_slots then game_done bd 0 0
@@ -141,12 +140,14 @@ module Game_controller = struct
         run_console { bd; player; black_slots; white_slots } ~ai uses_ai)
     else run_console { bd; player; black_slots; white_slots } ~ai uses_ai
 
+
   let run_two_player_console ({ bd; player; black_slots; white_slots } : t) :
       unit =
     run_console
       { bd; player; black_slots; white_slots }
       ~ai:(fun _ _ -> "")
       false
+
 
   let run_player_vs_ai_console ({ bd; player; black_slots; white_slots } : t)
       ~ai : unit =
