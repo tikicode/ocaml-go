@@ -28,9 +28,10 @@ let random_player (bd : Board.t) (player : Go_players.t) : string =
     let next_move =
       match open_center_pos with
       | [] ->
-          ( bd |> Board.get_size |> Random.int,
-            bd |> Board.get_size |> Random.int )
-      | lst -> lst |> List.length |> Random.int |> List.nth_exn lst
+          ( (bd |> Board.get_size |> Random.int) - 1,
+            (bd |> Board.get_size |> Random.int) - 1 )
+      | lst -> match lst |> List.length |> Random.int |> List.nth_exn lst with
+                | (row, col) -> (row -1, col -1)
     in
     if not (Rules.check_coords bd next_move) then check_move bd player
     else
