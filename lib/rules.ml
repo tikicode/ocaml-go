@@ -30,6 +30,9 @@ module Rules = struct
           in
           dfs board player (Set.add visited coord) (unvisited @ st)
 
+  let compare_tuples ((x1, y1) : int * int) ((x2, y2) : int * int) : bool =
+    if x1 = x2 && y1 = y2 then true else false
+
   let is_alive (bd : Board.t) (player : Go_players.t) (coord : int * int) : bool
       =
     let p = Board.get_player bd coord in

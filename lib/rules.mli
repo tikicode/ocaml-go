@@ -9,6 +9,7 @@ module Rules : sig
   val dfs :
     Board.t -> Go_players.t -> (int * int, 'a) Set.t -> (int * int) list -> bool
 
+  val compare_tuples : int * int -> int * int -> bool
   val is_alive : Board.t -> Go_players.t -> int * int -> bool
   val check_move : Board.t -> Go_players.t -> int * int -> bool
   val check_done : Go_players.t -> int -> int -> bool

@@ -220,13 +220,13 @@ let test_passturn _ =
   assert_equal same_board (Board.init_board 3)
 
 let test_conv_string_to_pair _ = 
-  let new_coord = Game_controller.conv_string_to_pair ("12 12") in 
-  assert_equal new_coord (11,11);
+  assert_equal (Game_controller.conv_string_to_pair "12 12") @@ (11, 11);
+  assert_equal (Game_controller.conv_string_to_pair "3 1") @@ (2, 0);
+  assert_equal (Game_controller.conv_string_to_pair "1") @@ (-1, -1);
+  assert_equal (Game_controller.conv_string_to_pair "abc") @@ (-1, -1);
+  assert_equal (Game_controller.conv_string_to_pair "$$!@3/n") @@ (-1, -1);
+  assert_equal (Game_controller.conv_string_to_pair "123") @@ (-1, -1)
 
-  assert_raises (Failure "Incorrect input") (fun () ->
-      let _ = Game_controller.conv_string_to_pair "invalid" in
-      ()
-    )
 let test_check_done _ = 
   assert_equal (Rules.check_done Go_players.white 10 10) false;
   assert_equal (Rules.check_done Go_players.white 0 10) false;
@@ -338,57 +338,62 @@ let test_compare_tuples _ =
   let tuple2 = (1, 2) in
   let tuple3 = (3, 4) in
 
-  assert_equal true (Game_controller.compare_tuples tuple1 tuple2);
-  assert_equal false (Game_controller.compare_tuples tuple1 tuple3)
+  assert_equal true (Rules.compare_tuples tuple1 tuple2);
+  assert_equal false (Rules.compare_tuples tuple1 tuple3)
 
-let suite =
-  "Go Test Suite" >:::
+let board_suite = 
+  "Board Test Suite" >:::
   [
-    "Board Test Suite" >:::
-    [
-      "test_get_neighbours" >:: test_get_neighbours;
-      "test_valid_coordinate" >:: test_valid_coordinate;
-      "test_get_board" >:: test_get_board;
-      "test_print_board" >:: test_print_board;
-      "test_init_board" >:: test_init_board;
-      "test_update_board" >:: test_update_board;
-    ];
-    "Go_players Test Suite" >:::
-    [
-      "test_empty" >:: test_is_empty;
-      "test_is_blank" >:: test_is_blank;
-      "test_is_white" >:: test_is_white;
-      "test_is_black" >:: test_is_black;
-      "test_is_same" >:: test_is_same;
-      "test_is_consistent" >:: test_is_consistent;
-      "test_to_char" >:: test_to_char;
-      "test_opposite" >:: test_opposite;
-      "test_hold" >:: test_hold;
-      "test_to_string" >:: test_to_string;
-    ];
-    "Game Controller Test Suite" >:::
-    [
-      "init game" >:: test_init;
-      "check coords" >:: test_check_board;
-      "test_get_player" >:: test_return_player;
-      "check alive" >:: test_is_alive;
-      "check picked pieces" >:: test_take_pieces;
-      "check scoring" >:: test_scoring;
-      "check pass turn" >:: test_passturn;
-      "check done" >:: test_check_done;
-      "test_conv_string_to_pair" >:: test_conv_string_to_pair;
-      "test_update_game" >:: test_update_game;
-      "test_run" >:: test_run;
-      "test_return_black" >:: test_return_black_slots;
-      "test_return_white" >:: test_return_white_slots;
-      "test_dead_pieces" >:: test_get_dead_pieces;
-      "test_compare_tuples" >:: test_compare_tuples;
-    ];
-    "Game AI Test Suite" >::: [
-      "open_center_positions" >:: test_open_center_positions;
-      "random_player" >:: test_random_player;
-    ];
+    "test_get_neighbours" >:: test_get_neighbours;
+    "test_valid_coordinate" >:: test_valid_coordinate;
+    "test_get_board" >:: test_get_board;
+    "test_print_board" >:: test_print_board;
+    "test_init_board" >:: test_init_board;
+    "test_update_board" >:: test_update_board;
+    "test_compare_tuples" >:: test_compare_tuples;
   ]
 
-let () =
-  run_test_tt_main suite
+let go_players_suite = 
+  "Go_players Test Suite" >:::
+  [
+    "test_empty" >:: test_is_empty;
+    "test_is_blank" >:: test_is_blank;
+    "test_is_white" >:: test_is_white;
+    "test_is_black" >:: test_is_black;
+    "test_is_same" >:: test_is_same;
+    "test_is_consistent" >:: test_is_consistent;
+    "test_to_char" >:: test_to_char;
+    "test_opposite" >:: test_opposite;
+    "test_hold" >:: test_hold;
+    "test_to_string" >:: test_to_string;
+  ]
+
+
+let game_controller_suite =
+
+  "Game Controller Test Suite" >:::
+  [
+    "init game" >:: test_init;
+    "check coords" >:: test_check_board;
+    "test_get_player" >:: test_return_player;
+    "check alive" >:: test_is_alive;
+    "check picked pieces" >:: test_take_pieces;
+    "check scoring" >:: test_scoring;
+    "check pass turn" >:: test_passturn;
+    "check done" >:: test_check_done;
+    "test_conv_string_to_pair" >:: test_conv_string_to_pair;
+    "test_update_game" >:: test_update_game;
+    "test_run" >:: test_run;
+    "test_return_black" >:: test_return_black_slots;
+    "test_return_white" >:: test_return_white_slots;
+    "test_dead_pieces" >:: test_get_dead_pieces;
+  ]
+
+let game_ai_suite = 
+  "Game AI Test Suite" >::: [
+    "open_center_positions" >:: test_open_center_positions;
+    "random_player" >:: test_random_player;
+  ]
+
+let series = "Go Tests" >::: [board_suite; go_players_suite; game_controller_suite; game_ai_suite]
+let () = run_test_tt_main series

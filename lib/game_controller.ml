@@ -31,7 +31,7 @@ module Game_controller = struct
   let conv_string_to_pair (move : string) : int * int =
     match String.split move ~on:' ' with
     | [ row; col ] -> (int_of_string row - 1, int_of_string col - 1)
-    | _ -> failwith "Incorrect input"
+    | _ -> (-1, -1)
 
   let update_game (bd : Board.t) (player : Go_players.t) (black_slots : int)
       (white_slots : int) (pieces : int) : t =
@@ -91,9 +91,6 @@ module Game_controller = struct
         | _ -> init_game 1 Go_players.black)
     | _ -> init_game 1 Go_players.black
 
-  let compare_tuples ((x1, y1) : int * int) ((x2, y2) : int * int) : bool =
-    if x1 = x2 && y1 = y2 then true else false
-
   [@@@coverage off]
 
   let game_done (bd : Board.t) (white_handi : int) (black_handi : int) : unit =
@@ -119,15 +116,13 @@ module Game_controller = struct
       if Go_players.is_black player && uses_ai then
         conv_string_to_pair (ai bd player)
       else
-        try
-          match In_channel.(input_line stdin) with
-          | None -> (-1, -1)
-          | Some input -> input |> conv_string_to_pair
-        with _ ->
-          print_string "Invalid input.\n";
-          (-1, -1)
+        match In_channel.(input_line stdin) with
+        | None -> (-1, -1)
+        | Some input -> input |> conv_string_to_pair
     in
-    if compare_tuples coord (-1, -1) then game_done bd 0 0
+    if Rules.compare_tuples coord (-1, -1) then (
+      print_string "Invalid input.\n";
+      run_console { bd; player; black_slots; white_slots } ~ai uses_ai)
     else if Rules.check_coords bd coord then
       let new_board = Board.update_board bd coord player in
       let occupied_board, pieces = Rules.take_pieces player new_board in

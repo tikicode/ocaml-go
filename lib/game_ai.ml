@@ -23,35 +23,32 @@ let ints_to_string ((x, y) : int * int) : string =
   string_of_int (x + 1) ^ " " ^ string_of_int (y + 1)
 
 let random_player (bd : Board.t) (player : Go_players.t) : string =
-  let open_center_pos = bd |> open_center_positions in
-  let rec check_move (bd : Board.t) (player : Go_players.t) (cnt : int) : string
-      =
-      let next_move =
-        if cnt > 10 then
-          ( (bd |> Board.get_size |> Random.int) - 1,
-            (bd |> Board.get_size |> Random.int) - 1 )
-        else
-        match open_center_pos with
-        | [] ->
-            ( (bd |> Board.get_size |> Random.int) - 1,
-              (bd |> Board.get_size |> Random.int) - 1 )
-        | lst -> (
-            match lst |> List.length |> Random.int |> List.nth_exn lst with
-            | row, col -> (row - 1, col - 1))
-      in
-      if not (Rules.check_coords bd next_move) then
-        check_move bd player (cnt + 1)
-      else
-        let p = Board.get_player bd next_move in
-        if p |> Go_players.is_blank then
-          let new_board = Board.update_board bd next_move player in
-          let occupied_board, _ = Rules.take_pieces player new_board in
-          if Rules.check_move occupied_board player next_move then
-            next_move |> ints_to_string
-          else check_move bd player (cnt + 1)
-        else check_move bd player (cnt + 1)
+  let rec check_move (bd : Board.t) (player : Go_players.t)
+      (center_pos : (int * int) list) : string =
+    let next_move =
+      match center_pos with
+      | [] ->
+          ( bd |> Board.get_size |> Random.int,
+            bd |> Board.get_size |> Random.int )
+      | l -> (l |> List.length |> Random.int, l |> List.length |> Random.int)
+    in
+    let new_centers =
+      List.filter
+        ~f:(fun x -> not (Rules.compare_tuples x next_move))
+        center_pos
+    in
+    if Rules.check_coords bd next_move then
+      let p = Board.get_player bd next_move in
+      if p |> Go_players.is_blank then
+        let new_board = Board.update_board bd next_move player in
+        let occupied_board, _ = Rules.take_pieces player new_board in
+        if Rules.check_move occupied_board player next_move then
+          next_move |> ints_to_string
+        else check_move bd player new_centers
+      else check_move bd player new_centers
+    else check_move bd player new_centers
   in
-  check_move bd player 0
+  check_move bd player (bd |> open_center_positions)
 
 module MCTS = struct
   type t = {
@@ -179,20 +176,3 @@ module MCTS = struct
     in
     run_sims root 0
 end
-
-(* ideas for impl
-   * when running expand, only expand n number of moves (keep it constant, say 250)
-     or expand until the game ends
-   * at the end of the search, return a tuple of the necessary move and of the root
-   of the tree (at this point, the human player's last move) so we can use it to expand
-   the next set and retain any memory we may have
-   * at each step, try to explore every child of the root at least once
-   * determine best move with uct from child
-   * if equivalents, randomly select
-   * see if we can train on some games already played first
-   * Figure out async, can we just wait until the games are played out? Will take
-   longer at the start of the game and shorter at the end
-   * compatibility with both local CL variants and posted variants of the game?
-   perhaps we change ai function to only return a move rather than the entire
-   game state
-   * bing bong i am sleepy *)
