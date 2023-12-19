@@ -29,7 +29,7 @@ let two_player_move_handler req =
   let old_state = game_state.game in
   game_state.game <- Game_controller.run game_state.game move;
   let remove =
-    match Game_controller.get_white_slots game_state.game = 1 with
+    match Game_controller.return_white_slots game_state.game = 1 with
     | true ->
         game_state.game <- old_state;
         [ Game_controller.conv_string_to_pair move ]
@@ -48,9 +48,7 @@ let ai_move_handler _ =
   let game = game_state.game in
   let board = Game_controller.return_board game in
   let player = Game_controller.return_player game in
-  let white_slots = Game_controller.return_white_slots game in
-  let black_slots = Game_controller.return_black_slots game in
-  let move = random_player board player white_slots black_slots in
+  let move = random_player board player in
   Dream.json ~headers (Yojson.Safe.to_string (turn_to_yojson move))
 
 let turn_handler _ =
