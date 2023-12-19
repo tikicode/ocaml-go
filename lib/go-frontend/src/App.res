@@ -65,9 +65,9 @@ let updateGameBoard = (event, findOffset, row, col, playingAI) => {
 
         // Append the div to the document body
         document.body.appendChild(newDiv);
-        if(playingAI) {
-          makeMoveAI(aiMoveEndpoint);
-        }
+        // if(playingAI) {
+        //   makeMoveAI(aiMoveEndpoint);
+        // }
         }
 
       function createPieceAI(row, col) {
@@ -98,9 +98,14 @@ let updateGameBoard = (event, findOffset, row, col, playingAI) => {
       if(!alreadyExists) {
         let turnEndpoint = "http://localhost:8080/player_turn";
         getTurn(turnEndpoint)
-        .then(_ => {
-            makeMove(moveEndpoint, true_row, true_col);
-          });
+        .then(() => {
+          return makeMove(moveEndpoint, true_row, true_col);
+        })
+        .then(() => {
+          if (playingAI) {
+            return makeMoveAI(aiMoveEndpoint);
+          }
+        });
       }
 
       function removePiece(coordinates) {
@@ -138,8 +143,10 @@ let updateGameBoard = (event, findOffset, row, col, playingAI) => {
         const movesArray = move.split(" ");
         const true_row = parseInt(movesArray[0], 10);
         const true_col = parseInt(movesArray[1], 10);
-        makeMove(moveEndpoint, true_row, true_col);
-        createPieceAI(true_row, true_col);
+        makeMove(moveEndpoint, true_row, true_col)
+        .then(_ => {
+        return createPieceAI(true_row, true_col);
+        });
         console.log("AI-ROW: " + true_row);
         console.log("AI-COL: " + true_col);
       }
