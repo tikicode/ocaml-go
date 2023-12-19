@@ -1,7 +1,3 @@
-(* let () =
-   Dream.run ~interface:"0.0.0.0" ~port:3000 (fun _ ->
-     Dream.html "Hello world!") *)
-
 open Go
 open Players
 open Rules

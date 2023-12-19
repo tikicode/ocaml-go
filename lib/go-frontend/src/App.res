@@ -1,52 +1,5 @@
 %%raw(`import './App.css'`)
 
-// module Response = {
-//   type t<'data>
-//   @send external json: t<'data> => Promise.t<'data> = "json"
-// }
-
-// type moves = {msg: string}
-
-// let params = {
-//   "method": "GET",
-//   "mode": "no-cors",
-// }
-
-// type response<'data> = {
-//   data: 'data,
-//   code: int,
-// }
-
-// type res = response<moves>
-
-// @val external fetch: (string, 'params) => Promise.t<Response.t<res>> = "fetch"
-
-// let makeRequest = async url => {
-//   open Promise
-//   Js.log("HIT1")
-//   fetch(url, params)->then(res => Response.json(res))->then(d => d.data)
-//->catch(e -> Error("Back Error"))
-//   switch data.code {
-//   | 200 =>
-//     Js.log("YES")
-//     Ok(data.data)
-//   | 500 => Error("Game not started")
-//   | _ => Error("Internal Server Error")
-//   }->resolve)
-// ->catch(e => "Error"
-// {
-//   let msg = switch e {
-//   | JsError(_) => "JS Error"
-//   | _ => "Unexpected error occurred"
-//   }
-//   Error(msg)->resolve
-// }
-//)
-//}
-
-// let requestTest = makeRequest(apiUrl)
-
-// Js.log(requestTest)
 let findOffset = (x, y, left, right, top, bottom, squareSize) => {
   if (
     x >= left - 1 &&
