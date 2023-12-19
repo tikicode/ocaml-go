@@ -33,7 +33,7 @@ module Rules = struct
   let is_alive (bd : Board.t) (player : Go_players.t) (coord : int * int) : bool
       =
     let p = Board.get_player bd coord in
-    if p  |> Go_players.is_blank then true
+    if p |> Go_players.is_blank then true
     else if Go_players.is_same player p then true
     else
       let set = Set.empty (module Tuple.Comparator (Int) (Int)) in

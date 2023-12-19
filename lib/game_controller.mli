@@ -19,7 +19,8 @@ module Game_controller : sig
   val run : t -> string -> t
   val run_console : t -> ai:(Board.t -> Go_players.t -> string) -> bool -> unit
   val run_two_player_console : t -> unit
-  val compare_tuples : (int * int) -> (int * int) -> bool
+  val compare_tuples : int * int -> int * int -> bool
+
   val run_player_vs_ai_console :
     t -> ai:(Board.t -> Go_players.t -> string) -> unit
 end

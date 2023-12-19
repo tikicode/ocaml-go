@@ -95,6 +95,7 @@ module Game_controller = struct
     if x1 = x2 && y1 = y2 then true else false
 
   [@@@coverage off]
+
   let game_done (bd : Board.t) (white_handi : int) (black_handi : int) : unit =
     let black_score = Rules.game_done_black_score bd + black_handi in
     let white_score = Rules.game_done_white_score bd + white_handi in
@@ -104,7 +105,7 @@ module Game_controller = struct
     if black_score > white_score then Printf.printf "Player Black wins!\n"
     else if black_score < white_score then Printf.printf "Player White wins!\n"
     else Printf.printf "It's a tie!\n"
-    
+
   let rec run_console ({ bd; player; black_slots; white_slots } : t) ~ai
       (uses_ai : bool) : unit =
     if Rules.check_done player black_slots white_slots then game_done bd 0 0
@@ -115,7 +116,8 @@ module Game_controller = struct
       (Go_players.to_string player);
     Out_channel.(flush stdout);
     let coord =
-      if Go_players.is_black player && uses_ai then conv_string_to_pair (ai bd player)
+      if Go_players.is_black player && uses_ai then
+        conv_string_to_pair (ai bd player)
       else
         try
           match In_channel.(input_line stdin) with
@@ -139,14 +141,12 @@ module Game_controller = struct
         run_console { bd; player; black_slots; white_slots } ~ai uses_ai)
     else run_console { bd; player; black_slots; white_slots } ~ai uses_ai
 
-
   let run_two_player_console ({ bd; player; black_slots; white_slots } : t) :
       unit =
     run_console
       { bd; player; black_slots; white_slots }
       ~ai:(fun _ _ -> "")
       false
-
 
   let run_player_vs_ai_console ({ bd; player; black_slots; white_slots } : t)
       ~ai : unit =

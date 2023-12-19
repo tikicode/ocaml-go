@@ -24,27 +24,34 @@ let ints_to_string ((x, y) : int * int) : string =
 
 let random_player (bd : Board.t) (player : Go_players.t) : string =
   let open_center_pos = bd |> open_center_positions in
-  let rec check_move (bd : Board.t) (player : Go_players.t) : string =
-    let next_move =
-      match open_center_pos with
-      | [] ->
+  let rec check_move (bd : Board.t) (player : Go_players.t) (cnt : int) : string
+      =
+      let next_move =
+        if cnt > 10 then
           ( (bd |> Board.get_size |> Random.int) - 1,
             (bd |> Board.get_size |> Random.int) - 1 )
-      | lst -> match lst |> List.length |> Random.int |> List.nth_exn lst with
-                | (row, col) -> (row -1, col -1)
-    in
-    if not (Rules.check_coords bd next_move) then check_move bd player
-    else
-      let p = Board.get_player bd next_move in
-      if p |> Go_players.is_blank then
-        let new_board = Board.update_board bd next_move player in
-        let occupied_board, _ = Rules.take_pieces player new_board in
-        if Rules.check_move occupied_board player next_move then
-          next_move |> ints_to_string
-        else check_move bd player
-      else check_move bd player
+        else
+        match open_center_pos with
+        | [] ->
+            ( (bd |> Board.get_size |> Random.int) - 1,
+              (bd |> Board.get_size |> Random.int) - 1 )
+        | lst -> (
+            match lst |> List.length |> Random.int |> List.nth_exn lst with
+            | row, col -> (row - 1, col - 1))
+      in
+      if not (Rules.check_coords bd next_move) then
+        check_move bd player (cnt + 1)
+      else
+        let p = Board.get_player bd next_move in
+        if p |> Go_players.is_blank then
+          let new_board = Board.update_board bd next_move player in
+          let occupied_board, _ = Rules.take_pieces player new_board in
+          if Rules.check_move occupied_board player next_move then
+            next_move |> ints_to_string
+          else check_move bd player (cnt + 1)
+        else check_move bd player (cnt + 1)
   in
-  check_move bd player
+  check_move bd player 0
 
 module MCTS = struct
   type t = {
