@@ -116,6 +116,13 @@ let test_is_white _ =
   assert_equal false (Go_players.is_white Go_players.whitehold);
   assert_equal false (Go_players.is_white Go_players.blackhold)
 
+let test_is_black _ =
+  assert_equal false (Go_players.is_black Go_players.white);
+  assert_equal true (Go_players.is_black Go_players.black);
+  assert_equal false (Go_players.is_black Go_players.empty);
+  assert_equal false (Go_players.is_black Go_players.whitehold);
+  assert_equal false (Go_players.is_black Go_players.blackhold)
+
 let test_is_same _ =
   assert_equal true (Go_players.is_same Go_players.white Go_players.white);
   assert_equal true (Go_players.is_same Go_players.black Go_players.black);
@@ -134,6 +141,8 @@ let test_is_consistent _ =
   assert_equal true (Go_players.is_consistent Go_players.whitehold Go_players.whitehold);
   assert_equal true (Go_players.is_consistent Go_players.blackhold Go_players.blackhold);
   assert_equal true (Go_players.is_consistent Go_players.black Go_players.blackhold);
+  assert_equal true (Go_players.is_consistent Go_players.white Go_players.whitehold);
+  assert_equal true (Go_players.is_consistent Go_players.whitehold Go_players.white);
   assert_equal true (Go_players.is_consistent Go_players.blackhold Go_players.black);
   assert_equal false (Go_players.is_consistent Go_players.white Go_players.black);
   assert_equal false (Go_players.is_consistent Go_players.empty Go_players.blackhold)
@@ -183,6 +192,10 @@ let picked_board = Board.update_board picked_board (1, 0) Go_players.black
 let picked_board = Board.update_board picked_board (1, 2) Go_players.black 
 let picked_board = Board.update_board picked_board (2, 1) Go_players.black 
 let picked_board = Board.update_board picked_board (1, 1) Go_players.blackhold
+
+let test_return_player _ = 
+  let game = Game_controller.init_game 19 Go_players.black in
+  assert_equal (Game_controller.return_player game) Go_players.black
 
 let test_is_alive _ = 
   let dead_pieces =  (Game_controller.return_dead Go_players.black updated_board) in 
@@ -246,9 +259,19 @@ let test_get_dead_pieces _ =
   assert_equal res_list [(1,1)];
 
   assert_raises (Failure "Incorrect input") (fun () ->
-    let _ = Game_controller.get_dead_pieces removed_state "invalid" in
-    ()
-  )
+      let _ = Game_controller.get_dead_pieces removed_state "invalid" in
+      ()
+    );
+
+  assert_raises (Failure "Incorrect input") (fun () ->
+      let _ = Game_controller.get_dead_pieces removed_state "f f" in
+      ()
+    );
+
+  assert_raises (Failure "Incorrect input") (fun () ->
+      let _ = Game_controller.get_dead_pieces removed_state "999 999" in
+      ()
+    )
 
 let test_run _ = 
   let mock_state = Game_controller.init_game 5 Go_players.black in
@@ -310,6 +333,14 @@ let test_return_white_slots _ =
   let game = Game_controller.init_game 19 Go_players.black in 
   assert_equal (Game_controller.return_white_slots game) 361
 
+let test_compare_tuples _ =
+  let tuple1 = (1, 2) in
+  let tuple2 = (1, 2) in
+  let tuple3 = (3, 4) in
+
+  assert_equal true (Game_controller.compare_tuples tuple1 tuple2);
+  assert_equal false (Game_controller.compare_tuples tuple1 tuple3)
+
 let suite =
   "Go Test Suite" >:::
   [
@@ -327,6 +358,7 @@ let suite =
       "test_empty" >:: test_is_empty;
       "test_is_blank" >:: test_is_blank;
       "test_is_white" >:: test_is_white;
+      "test_is_black" >:: test_is_black;
       "test_is_same" >:: test_is_same;
       "test_is_consistent" >:: test_is_consistent;
       "test_to_char" >:: test_to_char;
@@ -338,6 +370,7 @@ let suite =
     [
       "init game" >:: test_init;
       "check coords" >:: test_check_board;
+      "test_get_player" >:: test_return_player;
       "check alive" >:: test_is_alive;
       "check picked pieces" >:: test_take_pieces;
       "check scoring" >:: test_scoring;
@@ -349,6 +382,7 @@ let suite =
       "test_return_black" >:: test_return_black_slots;
       "test_return_white" >:: test_return_white_slots;
       "test_dead_pieces" >:: test_get_dead_pieces;
+      "test_compare_tuples" >:: test_compare_tuples;
     ];
     "Game AI Test Suite" >::: [
       "open_center_positions" >:: test_open_center_positions;

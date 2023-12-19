@@ -21,17 +21,6 @@ module Game_controller = struct
 
   let return_black_slots { black_slots; _ } : int = black_slots
   let return_white_slots { white_slots; _ } : int = white_slots
-
-  let game_done (bd : Board.t) (white_handi : int) (black_handi : int) : unit =
-    let black_score = Rules.game_done_black_score bd + black_handi in
-    let white_score = Rules.game_done_white_score bd + white_handi in
-    Printf.printf "\nThe score of player Black is: %d\n" black_score;
-    Printf.printf "The score of player White is: %d\n" white_score;
-
-    if black_score > white_score then Printf.printf "Player Black wins!\n"
-    else if black_score < white_score then Printf.printf "Player White wins!\n"
-    else Printf.printf "It's a tie!\n"
-
   let return_board { bd; _ } : Board.t = bd
   let return_player_name { player; _ } : string = player |> Go_players.to_string
   let return_player { player; _ } : Go_players.t = player
@@ -106,6 +95,16 @@ module Game_controller = struct
     if x1 = x2 && y1 = y2 then true else false
 
   [@@@coverage off]
+  let game_done (bd : Board.t) (white_handi : int) (black_handi : int) : unit =
+    let black_score = Rules.game_done_black_score bd + black_handi in
+    let white_score = Rules.game_done_white_score bd + white_handi in
+    Printf.printf "\nThe score of player Black is: %d\n" black_score;
+    Printf.printf "The score of player White is: %d\n" white_score;
+
+    if black_score > white_score then Printf.printf "Player Black wins!\n"
+    else if black_score < white_score then Printf.printf "Player White wins!\n"
+    else Printf.printf "It's a tie!\n"
+    
   let rec run_console ({ bd; player; black_slots; white_slots } : t) ~ai
       (uses_ai : bool) : unit =
     if Rules.check_done player black_slots white_slots then game_done bd 0 0
