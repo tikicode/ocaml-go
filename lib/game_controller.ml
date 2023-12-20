@@ -28,11 +28,6 @@ module Game_controller = struct
   let pass_turn { bd; player; black_slots; white_slots } : t =
     { bd; player = player |> Go_players.opposite; black_slots; white_slots }
 
-  let conv_string_to_pair (move : string) : int * int =
-    match String.split move ~on:' ' with
-    | [ row; col ] -> (int_of_string row - 1, int_of_string col - 1)
-    | _ -> (-1, -1)
-
   let update_game (bd : Board.t) (player : Go_players.t) (black_slots : int)
       (white_slots : int) (pieces : int) : t =
     let new_player = player |> Go_players.opposite in
@@ -114,11 +109,11 @@ module Game_controller = struct
     Out_channel.(flush stdout);
     let coord =
       if Go_players.is_black player && uses_ai then
-        conv_string_to_pair (ai bd player)
+        Rules.string_to_move (ai bd player)
       else
         match In_channel.(input_line stdin) with
         | None -> (-1, -1)
-        | Some input -> input |> conv_string_to_pair
+        | Some input -> input |> Rules.string_to_move
     in
     if Rules.compare_tuples coord (-1, -1) then (
       print_string "Invalid input.\n";

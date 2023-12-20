@@ -10,6 +10,7 @@ module MCTS : sig
   val random_move :
     Board.t -> Go_players.t -> int -> int -> Board.t * (int * int) * int * int
 
+  val init_node : Board.t -> Go_players.t -> int -> int -> string -> t
   val result : t -> int
   val backpropagate : t list -> int -> t -> t
   val expand_node : t -> t

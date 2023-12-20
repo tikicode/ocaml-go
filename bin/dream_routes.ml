@@ -28,7 +28,7 @@ let two_player_move_handler req =
     match Game_controller.return_white_slots game_state.game = 1 with
     | true ->
         game_state.game <- old_state;
-        [ Game_controller.conv_string_to_pair move ]
+        [ Rules.string_to_move move ]
     | false -> removed_pieces
   in
   Dream.json ~headers (Yojson.Safe.to_string (data_list_to_yojson remove))

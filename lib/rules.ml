@@ -32,6 +32,14 @@ module Rules = struct
 
   let compare_tuples ((x1, y1) : int * int) ((x2, y2) : int * int) : bool =
     if x1 = x2 && y1 = y2 then true else false
+  
+  let string_to_move (move : string) : int * int =
+    match String.split move ~on:' ' with
+    | [ row; col ] -> (int_of_string row - 1, int_of_string col - 1)
+    | _ -> (-1, -1)
+
+  let move_to_string ((x, y) : int * int) : string =
+    string_of_int (x + 1) ^ " " ^ string_of_int (y + 1)
 
   let is_alive (bd : Board.t) (player : Go_players.t) (coord : int * int) : bool
       =

@@ -8,7 +8,6 @@ module Game_controller : sig
   val get_dead_pieces : t -> string -> (int * int) list
   val game_done : Board.t -> int -> int -> unit
   val update_game : Board.t -> Go_players.t -> int -> int -> int -> t
-  val conv_string_to_pair : string -> int * int
   val return_black_slots : t -> int
   val return_white_slots : t -> int
   val return_board : t -> Board.t

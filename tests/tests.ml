@@ -219,13 +219,13 @@ let test_passturn _ =
   assert_equal new_player "White";
   assert_equal same_board (Board.init_board 3)
 
-let test_conv_string_to_pair _ = 
-  assert_equal (Game_controller.conv_string_to_pair "12 12") @@ (11, 11);
-  assert_equal (Game_controller.conv_string_to_pair "3 1") @@ (2, 0);
-  assert_equal (Game_controller.conv_string_to_pair "1") @@ (-1, -1);
-  assert_equal (Game_controller.conv_string_to_pair "abc") @@ (-1, -1);
-  assert_equal (Game_controller.conv_string_to_pair "$$!@3/n") @@ (-1, -1);
-  assert_equal (Game_controller.conv_string_to_pair "123") @@ (-1, -1)
+let test_string_to_move _ = 
+  assert_equal (Rules.string_to_move "12 12") @@ (11, 11);
+  assert_equal (Rules.string_to_move "3 1") @@ (2, 0);
+  assert_equal (Rules.string_to_move "1") @@ (-1, -1);
+  assert_equal (Rules.string_to_move "abc") @@ (-1, -1);
+  assert_equal (Rules.string_to_move "$$!@3/n") @@ (-1, -1);
+  assert_equal (Rules.string_to_move "123") @@ (-1, -1)
 
 let test_check_done _ = 
   assert_equal (Rules.check_done Go_players.white 10 10) false;
@@ -341,6 +341,39 @@ let test_compare_tuples _ =
   assert_equal true (Rules.compare_tuples tuple1 tuple2);
   assert_equal false (Rules.compare_tuples tuple1 tuple3)
 
+let test_update_slots _ =
+  assert_equal (MCTS.update_slots Go_players.black 2 2 1) @@ (2, 1);
+  assert_equal (MCTS.update_slots Go_players.black 2 2 0) @@ (1, 1);
+  assert_equal (MCTS.update_slots Go_players.white 2 2 1) @@ (1, 2);
+  assert_equal (MCTS.update_slots Go_players.white 2 2 0) @@ (1, 1)
+
+let test_random_move _ = 
+  let board_size = 2 in
+  let test_board = Board.init_board board_size in
+  let updated_board1 = Board.update_board test_board (0, 0) Go_players.white in
+  let updated_board2 = Board.update_board updated_board1 (0, 1) Go_players.black in
+  let updated_board3 = Board.update_board updated_board2 (1, 0) Go_players.white in
+  let verify_board = Board.init_board board_size in
+  let verify_board1 = Board.update_board verify_board (0, 1) Go_players.black in
+  let verify_board2 = Board.update_board verify_board1 (1, 1) Go_players.black in
+  let bd, move, wsl, bsl = MCTS.random_move updated_board3 Go_players.black 1 2 in 
+  assert_equal move @@ (1, 1);
+  assert_equal bsl @@ 2;
+  assert_equal wsl @@ 2;
+  assert_equal (bd |> Board.get_board) @@ (verify_board2 |> Board.get_board)
+
+let test_select_child _ = 
+  let board_size = 2 in
+  let test_board = Board.init_board board_size in 
+  let test_node = MCTS.init_node test_board Go_players.white 0 0 "0 0" in
+  assert_equal (MCTS.select_child test_node) @@ None
+
+let test_tree_policy _ =
+  let board_size = 2 in
+  let test_board = Board.init_board board_size in 
+  let test_node = MCTS.init_node test_board Go_players.white 0 0 "0 0" in
+  assert_equal (MCTS.tree_policy test_node) @@ test_node
+
 let board_suite = 
   "Board Test Suite" >:::
   [
@@ -368,7 +401,6 @@ let go_players_suite =
     "test_to_string" >:: test_to_string;
   ]
 
-
 let game_controller_suite =
 
   "Game Controller Test Suite" >:::
@@ -381,7 +413,7 @@ let game_controller_suite =
     "check scoring" >:: test_scoring;
     "check pass turn" >:: test_passturn;
     "check done" >:: test_check_done;
-    "test_conv_string_to_pair" >:: test_conv_string_to_pair;
+    "test_string_to_move" >:: test_string_to_move;
     "test_update_game" >:: test_update_game;
     "test_run" >:: test_run;
     "test_return_black" >:: test_return_black_slots;
@@ -393,6 +425,10 @@ let game_ai_suite =
   "Game AI Test Suite" >::: [
     "open_center_positions" >:: test_open_center_positions;
     "random_player" >:: test_random_player;
+    "update_slots" >:: test_update_slots;
+    "random_move" >:: test_random_move;
+    "select_child" >:: test_select_child;
+    "tree_policy" >:: test_tree_policy;
   ]
 
 let series = "Go Tests" >::: [board_suite; go_players_suite; game_controller_suite; game_ai_suite]

@@ -19,9 +19,6 @@ let open_center_positions (bd : Board.t) : (int * int) list =
   in
   List.filter ~f:add_if_blank (create_pairs range)
 
-let ints_to_string ((x, y) : int * int) : string =
-  string_of_int (x + 1) ^ " " ^ string_of_int (y + 1)
-
 let random_player (bd : Board.t) (player : Go_players.t) : string =
   let rec check_move (bd : Board.t) (player : Go_players.t)
       (center_pos : (int * int) list) : string =
@@ -43,7 +40,7 @@ let random_player (bd : Board.t) (player : Go_players.t) : string =
         let new_board = Board.update_board bd next_move player in
         let occupied_board, _ = Rules.take_pieces player new_board in
         if Rules.check_move occupied_board player next_move then
-          next_move |> ints_to_string
+          next_move |> Rules.move_to_string
         else check_move bd player new_centers
       else check_move bd player new_centers
     else check_move bd player new_centers
@@ -109,7 +106,7 @@ module MCTS = struct
         cur_node.wins <- cur_node.wins + result;
         backpropagate rest result cur_node
 
-  let create_new_node (node : t) : t =
+  let create_new_child (node : t) : t =
     let bd, move, black_slots, white_slots =
       random_move node.bd node.player node.black_slots node.white_slots
     in
@@ -124,10 +121,23 @@ module MCTS = struct
       wins = 0;
       children = [];
     }
+  
+  let init_node (bd : Board.t) (player : Go_players.t) (black_slots : int)
+  (white_slots : int) (move : string) : t = 
+    {
+      bd;
+      player;
+      black_slots;
+      white_slots;
+      move = Rules.string_to_move move;
+      visits = 0;
+      wins = 0;
+      children = [];
+    }
 
   let expand_node (n : t) : t =
     let rec simulate (node : t) (stack : t list) (depth : int) =
-      let child_node = node |> create_new_node in
+      let child_node = node |> create_new_child in
       node.children <- child_node :: node.children;
       let new_stack = child_node :: stack in
       if
@@ -171,7 +181,7 @@ module MCTS = struct
         match select_child root with
         | Some child -> (child, child.move)
         | None ->
-            let child = node |> create_new_node in
+            let child = node |> create_new_child in
             (child, child.move)
     in
     run_sims root 0
